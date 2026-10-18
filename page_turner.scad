@@ -14,10 +14,13 @@ y_xiao1   = pcb_y0 + xiao[1];
 y_batt0   = lead_gap;
 y_batt1   = y_batt0 + batt[1] + 2*pocket_fit;
 po        = sw_body + 2*pocket_fit + 2*pocket_wall;   // pocket outer size
-y_sw0     = max(y_xiao1 + antenna_keepout, y_batt1 + 0.5);
-sw_pitch  = cap[1] + cap_gap;
-sw_y      = [y_sw0 + po/2, y_sw0 + po/2 + sw_pitch];
-inner_l   = sw_y[1] + po/2 + 0.5;
+cap       = [2*(inner_w/2 - lid_fit - lip_t - lid_frame - fit), cap_len];
+cap_h     = lid_t - cap_recess;                        // cap body above the flange
+flange    = cap + [2*flange_lip, 2*flange_lip];
+y_btn0    = y_xiao1 + pocket_fit + 1.2 + btn_start;    // past the PCB end stops
+cap_y     = [y_btn0 + cap[1]/2, y_btn0 + cap[1]*1.5 + cap_gap];   // cap centres
+sw_y      = [max(cap_y[0], y_batt1 + 0.5 + po/2), cap_y[1]];      // switch centres (NEXT may sit off-centre, past the battery)
+inner_l   = cap_y[1] + cap[1]/2 + fit + lid_frame + lip_t + lid_fit;
 outer     = [inner_w + 2*wall, inner_l + 2*wall, floor_t + inner_h + lid_t];
 z_shelf   = inner_h - flange_t - sw_h + preload;
 usb_w     = usb[0] + usb_slop;
@@ -25,8 +28,9 @@ usb_w     = usb[0] + usb_slop;
 assert(z_shelf >= 0.5, "switch too tall for stack: shelf below floor");
 assert(z_shelf + pocket_wall_h <= inner_h - flange_t - 0.5, "flange would hit pocket wall");
 assert(wall - (snap_bump + 0.1) >= 0.8, "snap groove leaves wall too thin");
-assert(sw_pitch >= po, "switch pockets overlap");
-echo(outer=outer, inner=[inner_w, inner_l, inner_h], z_shelf=z_shelf, sw_y=sw_y);
+assert(sw_y[0] + po/2 <= cap_y[0] + cap[1]/2, "NEXT switch pocket sticks out past its cap");
+assert(cap[0] >= 12, "caps too narrow; widen the case (side_gap) or thin the lip");
+echo(outer=outer, inner=[inner_w, inner_l, inner_h], cap=cap, cap_y=cap_y, sw_y=sw_y, z_shelf=z_shelf);
 
 // ---------- helpers ----------
 module rrect(s, r) { translate([r, r]) offset(r) square([s[0]-2*r, s[1]-2*r]); }
@@ -76,7 +80,7 @@ module lid() {
         translate([s*(inner_w/2 - lid_fit) - (s > 0 ? 0 : snap_bump), y - snap_len/2, inner_h - snap_z - 0.6])
           hull() { cube([0.01, snap_len, 1.2]); translate([s > 0 ? snap_bump - 0.01 : 0, 1, 0.3]) cube([0.01, snap_len - 2, 0.6]); }
     }
-    for (y = sw_y) translate([-(stem[0]/2 + fit), y - (stem[1]/2 + fit), inner_h - 1]) cube([stem[0] + 2*fit, stem[1] + 2*fit, lid_t + 2]);
+    for (y = cap_y) translate([-(cap[0]/2 + fit), y - (cap[1]/2 + fit), inner_h - 1]) cube([cap[0] + 2*fit, cap[1] + 2*fit, lid_t + 2]);
     translate([reset_pos[0], pcb_y0 + reset_pos[1], inner_h - 1]) cylinder(d = reset_hole_d, h = lid_t + 2);
     // clear the lip above the USB notch
     translate([-usb_w/2 - 0.5, -1, inner_h - lip_h - 1]) cube([usb_w + 1, lip_t + lid_fit + 1.5, lip_h + 1]);
@@ -85,16 +89,12 @@ module lid() {
 
 // ---------- plungers (printed cap-up; z=0 is flange underside) ----------
 module plunger(prev = false) {
-  z0 = flange_t + lid_t + cap_lift;
   translate([-flange[0]/2, -flange[1]/2, 0]) cube([flange[0], flange[1], flange_t]);
-  translate([-stem[0]/2, -stem[1]/2, flange_t - 0.01]) cube([stem[0], stem[1], lid_t + cap_lift + 0.02]);
-  hull() {
-    translate([-stem[0]/2, -stem[1]/2, z0]) cube([stem[0], stem[1], 0.01]);
-    translate([-cap[0]/2, -cap[1]/2, z0 + (cap[0] - stem[0])/2]) cube([cap[0], cap[1], 0.01]);
-    translate([-cap[0]/2, -cap[1]/2, z0 + cap_t - 0.4]) cube([cap[0], cap[1], 0.01]);
-    translate([-cap[0]/2 + 0.4, -cap[1]/2 + 0.4, z0 + cap_t]) cube([cap[0] - 0.8, cap[1] - 0.8, 0.01]);
+  hull() {   // cap body with a 0.4 top-edge chamfer
+    translate([-cap[0]/2, -cap[1]/2, flange_t - 0.01]) cube([cap[0], cap[1], cap_h - 0.4]);
+    translate([-cap[0]/2 + 0.4, -cap[1]/2 + 0.4, flange_t - 0.01]) cube([cap[0] - 0.8, cap[1] - 0.8, cap_h]);
   }
-  if (prev) translate([-cap[0]/2 + 1, -ridge[0]/2, z0 + cap_t - 0.01]) cube([cap[0] - 2, ridge[0], ridge[1]]);
+  if (prev) translate([-cap[0]/2 + 1.5, -ridge[0]/2, flange_t + cap_h - 0.01]) cube([cap[0] - 3, ridge[0], ridge[1]]);
 }
 
 // ---------- hardware mockups ----------
@@ -110,7 +110,7 @@ module hw() {
   }
 }
 
-module plungers(dz = 0) for (i = [0, 1]) translate([0, sw_y[i], inner_h - flange_t + dz]) plunger(prev = i == 1);
+module plungers(dz = 0) for (i = [0, 1]) translate([0, cap_y[i], inner_h - flange_t + dz]) plunger(prev = i == 1);
 
 module label(t, p, z = 25) color("Black") translate([p[0], p[1], z]) linear_extrude(0.5) text(t, size = 2.2, halign = "center", valign = "center");
 
@@ -130,8 +130,8 @@ if (part == "layout") {
   label("USB-C", [0, -4]);
   label("reset pinhole", [reset_pos[0], pcb_y0 + reset_pos[1] + 2.5]);
   label("antenna end", [0, y_xiao1 - 1.5]);
-  label("battery (below)", [0, y_batt1 - 2]);
-  label("NEXT (flat)", [0, sw_y[0]]);
-  label("PREV (ridge)", [0, sw_y[1]]);
-  label("wires", [-inner_w/2 + 2, y_xiao1 + 1.5]);
+  label("battery (below)", [0, y_batt1 - 3.5]);
+  label("NEXT (flat cap)", [0, cap_y[0] + 3]);
+  label("PREV (ridged cap)", [0, cap_y[1] + 3]);
+  label("wires", [-inner_w/2 + 2.5, y_xiao1 - 6]);
 }

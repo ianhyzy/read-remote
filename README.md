@@ -2,7 +2,7 @@
 
 3D-printable case for a two-button ZMK page-turner remote: Seeed XIAO nRF52840 + 402025 LiPo + two 6×6×5 silent tactile switches. Hand-wired, no PCB.
 
-Outer size with nominal parts: **25 × 50 × 13 mm** (plus 2.4 mm of button cap). Four printed parts: `base`, `lid`, `plunger_next`, `plunger_prev`.
+Outer size with nominal parts: **25 × 59 × 13.5 mm**. The two button caps are 16.6 × 13 mm, recessed 0.5 mm into the lid, and fill the far half of the top face. Four printed parts: `base`, `lid`, `plunger_next`, `plunger_prev`.
 
 ![layout](renders/layout.png) ![section](renders/section.png)
 
@@ -38,7 +38,8 @@ Nominal values in `params.scad` are from datasheets. Caliper these and update:
 |---|---|
 | plunger binds in lid hole | `fit` 0.25 → 0.35 |
 | plunger rattles / cap sits low | `preload` 0 → 0.1 (raises the switch shelf) |
-| cap touches lid when pressed | `cap_lift` 0.4 → 0.6 |
+| caps feel too flush / want deeper recess | `cap_recess` 0.5 → 1.0 |
+| buttons too long / case too long | `cap_len` 13 → 11 |
 | lid won't snap / too tight | `snap_bump` 0.4 → 0.3, or `lid_fit` 0.2 → 0.3 |
 | lid loose | `snap_bump` 0.4 → 0.5 |
 | switch loose in pocket | `pocket_fit` 0.15 → 0.1 |
@@ -51,12 +52,12 @@ Nominal values in `params.scad` are from datasheets. Caliper these and update:
 4. Lay the battery in the base, PCM/lead end toward the USB wall, in the 2 mm lead gap.
 5. Set the XIAO on the side rails, USB-C into the end notch, component side up. The chamfered end stops hold it from sliding back.
 6. Route switch wires along the side gaps beside the PCB and solder to the edge pads: NEXT switch → D0 and GND, PREV switch → D1 and GND (change in your ZMK keymap). Keep wires away from the antenna end (the tan strip in the layout render).
-7. Drop the plungers into the lid holes from underneath (flange inside, cap out). NEXT = flat cap, PREV = ridged cap, nearer the far end.
+7. Drop the caps into the lid windows from underneath (flange inside, cap out). NEXT = flat cap (nearer the USB end), PREV = ridged cap (far end).
 8. Press the lid on until the four side bumps snap in. To open, use a fingernail in the notch at the end opposite the USB.
 
 Reset: poke a paperclip into the pinhole above the USB end. Double-press for the UF2 bootloader.
 
 ## Design notes
-- Each plunger rests on its switch dome and is retained by a flange under the lid. Travel (~0.25 mm) stops on the switch; the cap floats 0.4 mm above the lid so plastic never meets plastic. On release the flange returns against the lid underside; the silicone dome makes that inaudible.
+- Each cap rests on its switch dome and is retained by a 1 mm flange under the lid. Travel (~0.25 mm) stops on the switch; the cap sits 0.5 mm below the lid surface in a window with 0.25 mm clearance, so plastic never meets plastic. The NEXT switch sits 1.6 mm off its cap centre (toward the far end) to clear the battery; the thumb never notices. On release the flange returns against the lid underside; the silicone dome makes that inaudible.
 - No metal or thick plastic above the antenna end: the lid is a plain 1.6 mm plate there and the 3 mm `antenna_keepout` zone past the PCB is empty.
 - The battery sits under the PCB; the stack is what sets the 13 mm height. The switch zone sits past the battery so the switch shelf can be solid.

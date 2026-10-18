@@ -32,7 +32,7 @@ preload     = 0.0;    // raise switch shelf to take up plunger slack (0.1 if cap
 // ---- Case ----
 wall        = 1.6;
 floor_t     = 1.6;
-lid_t       = 1.6;
+lid_t       = 2.0;
 corner_r    = 3.0;
 top_gap     = 0.3;    // USB shell top to lid underside
 side_gap    = 1.5;    // min wire space beside the PCB (each side)
@@ -46,12 +46,12 @@ snap_len    = 5.0;
 snap_z      = 1.4;    // bump centre below lid underside
 pry_notch   = [8, 1.2];  // fingernail slot at the far end: width, depth
 
-// ---- Plungers ----
-stem        = [7.5, 5.5];   // through-lid stem (X, Y)
-flange      = [10.0, 8.0];  // under-lid retaining flange
+// ---- Buttons (big recessed caps; width is computed to fill the lid) ----
+lid_frame   = 1.0;          // lid material between cap window and the lip
+cap_len     = 13.0;         // each cap's length along the case (Y)
+cap_gap     = 3.0;          // lid bar between the two caps
+cap_recess  = 0.5;          // cap top sits this far below the lid surface
+flange_lip  = 1.0;          // under-lid retaining flange, each side
 flange_t    = 1.0;
-cap         = [10.5, 8.5];  // visible cap
-cap_t       = 2.0;
-cap_lift    = 0.4;          // cap floats this far above lid at rest (> switch travel)
-cap_gap     = 1.5;          // gap between the two caps
-ridge       = [1.5, 1.0];   // "previous" cap ridge: width, height
+ridge       = [1.5, 1.0];   // "previous" cap ridge: width, height (peaks ridge-cap_recess above the lid)
+btn_start   = 1.2;          // button zone starts this far past the PCB end stops
