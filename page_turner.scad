@@ -2,7 +2,7 @@
 include <params.scad>
 
 part    = "assembly";   // base | lid | plunger_next | plunger_prev | assembly | exploded | section | layout
-variant = "dishdome";   // kobo | rocker | dishdome | bars | sidebyside | trigger | dot
+variant = "kobo";       // kobo | rocker | dishdome | bars | sidebyside | trigger | dot
 $fn = 48;
 
 // ---------- derived layout (origin: X centred, Y = inner USB wall, Z = inner floor) ----------
@@ -49,12 +49,27 @@ for (s = sws) assert(s[1] >= yp - 0.01, "switch pocket overlaps battery");
 echo(variant=variant, outer=outer, inner=[inner_w, inner_l, inner_h], caps=caps, sws=sws);
 
 // ---------- helpers ----------
-module rrect(s, r) { translate([r, r]) offset(r) square([s[0]-2*r, s[1]-2*r]); }
-module rbox(s, r) { linear_extrude(s[2]) rrect([s[0], s[1]], r); }
-module inner_rect() { translate([-inner_w/2, 0]) square([inner_w, inner_l]); }
-module cap2d(c, grow = 0) {   // cap footprint, centred on origin
-  if (c[4] == "round") circle(d = c[2] + 2*grow);
-  else offset(cap_r + grow) square([c[2] - 2*cap_r, c[3] - 2*cap_r], center = true);
+H_tot   = floor_t + inner_h + lid_t;
+r_far   = end_btn ? min(r_plan_far, 6) : r_plan_far;   // trigger variant needs a flat end wall
+corners = [for (sx = [-1, 1]) [sx*(outer[0]/2 - r_plan_usb), -wall + r_plan_usb, r_plan_usb],
+           for (sx = [-1, 1]) [sx*(outer[0]/2 - r_far), inner_l + wall - r_far, r_far]];
+module plan2d() hull() for (c = corners) translate([c[0], c[1]]) circle(c[2]);
+module cavity2d() offset(-wall) plan2d();
+module edge_profile(rp) intersection() { square([rp, H_tot]); hull() {   // vertical half-profile of one corner: fillets with 45deg blends at bed/top
+  square([rp - max(r_bot, r_top), H_tot]); square([0.01, H_tot]);
+  translate([rp - r_bot, r_bot]) circle(r_bot);
+  translate([rp - r_top, H_tot - r_top]) circle(r_top);
+  translate([rp - r_bot + 0.414*r_bot, 0]) square(0.01);
+  translate([rp - r_top + 0.414*r_top, H_tot - 0.01]) square(0.01);
+} }
+module outer3d() hull() for (c = corners) translate([c[0], c[1], -floor_t]) rotate_extrude($fn = 96) edge_profile(c[2]);
+module allowed2d() offset(-(lid_fit + lip_t + lid_frame + fit)) cavity2d();   // where a cap body may be
+module cap2d(c, grow = 0) {   // cap footprint, centred on origin, clipped to what fits inside the lid frame
+  intersection() {
+    if (c[4] == "round") circle(d = c[2] + 2*grow);
+    else offset(cap_r + grow) square([c[2] - 2*cap_r, c[3] - 2*cap_r], center = true);
+    translate([-c[0], -c[1]]) offset(grow) allowed2d();
+  }
 }
 module chamfered_block(s, c) {
   hull() { translate([0, 0, c]) cube([s[0], s[1], s[2]-c]); translate([c, 0, 0]) cube([s[0]-2*c, s[1], 1]); }
@@ -76,13 +91,13 @@ module end_pocket() {   // switch lying on its side at the far wall, dome facing
 }
 module base() {
   difference() {
-    translate([-outer[0]/2, -wall, -floor_t]) rbox([outer[0], outer[1], floor_t + inner_h], corner_r);
-    translate([-inner_w/2, 0, 0]) cube([inner_w, inner_l, inner_h + 1]);
+    intersection() { outer3d(); translate([-50, -50, -floor_t - 1]) cube([100, 200, floor_t + inner_h + 1]); }
+    linear_extrude(inner_h + 1) cavity2d();
     translate([-usb_w/2, -wall - 1, z_pcb_top - 0.2]) cube([usb_w, wall + 2, 20]);     // USB-C notch
     for (s = [-1, 1], y = snap_ys)
       translate([s*inner_w/2 - (s > 0 ? 0 : snap_bump + 0.1), y - snap_len/2 - 0.3, inner_h - snap_z - 0.7])
         cube([snap_bump + 0.1, snap_len + 0.6, 1.4]);
-    if (lanyard_d > 0) translate([inner_w/2 - 3.5, inner_l - 1, 4]) rotate([-90, 0, 0]) cylinder(d = lanyard_d, h = wall + 2);
+    if (lanyard_d > 0) translate([end_btn ? 7 : 0, inner_l - 1, 4]) rotate([-90, 0, 0]) cylinder(d = lanyard_d, h = r_plan_far + 2);
     if (end_btn) translate([-(end_cap[0]/2 + fit), inner_l - 1, end_z - end_cap[1]/2 - fit]) cube([end_cap[0] + 2*fit, wall + 2, end_cap[1] + 2*fit]);
   }
   for (s = [-1, 1]) {   // PCB rails + chamfered end stops
@@ -98,9 +113,9 @@ module base() {
 module lid() {
   difference() {
     union() {
-      translate([-outer[0]/2, -wall, inner_h]) rbox([outer[0], outer[1], lid_t], corner_r);
+      intersection() { outer3d(); translate([-50, -50, inner_h]) cube([100, 200, lid_t + 1]); }
       translate([0, 0, inner_h - lip_h]) linear_extrude(lip_h + 0.01)
-        difference() { offset(-lid_fit) inner_rect(); offset(-lid_fit - lip_t) inner_rect(); }
+        difference() { offset(-lid_fit) cavity2d(); offset(-lid_fit - lip_t) cavity2d(); }
       for (s = [-1, 1], y = snap_ys)
         translate([s*(inner_w/2 - lid_fit) - (s > 0 ? 0 : snap_bump), y - snap_len/2, inner_h - snap_z - 0.6])
           hull() { cube([0.01, snap_len, 1.2]); translate([s > 0 ? snap_bump - 0.01 : 0, 1, 0.3]) cube([0.01, snap_len - 2, 0.6]); }

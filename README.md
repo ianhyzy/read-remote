@@ -2,7 +2,7 @@
 
 3D-printable case for a two-button ZMK page-turner remote: Seeed XIAO nRF52840 + 402025 LiPo + two 6×6×5 silent tactile switches. Hand-wired, no PCB.
 
-Outer size with nominal parts: about **25 × 60 × 13.5 mm** depending on the button layout. Seven button layouts are built in (`variant` in `page_turner.scad`); see [DESIGNS.md](DESIGNS.md) for the research and the comparison table. Four printed parts: `base`, `lid`, `plunger_next`, `plunger_prev`.
+Outer size with nominal parts: **25 × 61 × 14.5 mm**, pebble-shaped: squarer at the USB end (r4.5), near-semicircular at the button end (r10), 2.5 mm rounded top edge, 3 mm rounded bottom edge. The default layout is `kobo` (big dished NEXT at the rounded end, small domed PREV below it). Six other layouts are built in (`variant` in `page_turner.scad`); see [DESIGNS.md](DESIGNS.md). Four printed parts: `base`, `lid`, `plunger_next`, `plunger_prev`.
 
 ![layout](renders/layout.png) ![section](renders/section.png)
 
@@ -22,13 +22,15 @@ Nominal values in `params.scad` are from datasheets. Caliper these and update:
 | `usb_overhang` | how far the USB-C shell nose sticks past the PCB edge | 1.0 |
 | `reset_pos` | reset button centre: X from PCB centreline, Y from the USB edge | 4.5, 2.5 |
 | `batt` | battery width × length × thickness, **including the PCM hump and tape** | 20 × 25 × 4.5 |
+
+The PCB corners sit in the USB-end cavity corners with ~0.2 mm to spare at `r_plan_usb` 4.5; if your XIAO measures wider than 17.8, drop `r_plan_usb` to 4.
 | `sw_h` | switch: floor to top of silicone dome, unpressed | 5.0 |
 | `sw_body` | switch body square | 6.0 |
 
 `reset_pos` is the one most likely to be wrong; the pinhole is 1.6 mm so there is ±0.5 mm of slack.
 
 ## Printing (Bambu P1S)
-- PLA (or PETG), 0.4 nozzle, 0.16 mm layers, 3 walls, no supports.
+- PLA (or PETG), 0.4 nozzle, 0.16 mm layers, 3 walls, no supports. The rounded bottom (base) and top (lid) edges start with a 45° blend at the bed so neither needs support; expect a faint facet line ~1 mm up from the bed edge.
 - `base.stl`: open side up, as exported.
 - `lid.stl`: exported **top-face down** (lip and snap bumps point up). Smooth or textured plate, your call; the textured plate gives the lid a matte top.
 - `plunger_*.stl`: exported **cap up**, flange on the bed. Enable **ironing** on top surfaces so the caps are glossy-smooth. Print 2–3 of each; they are tiny.
@@ -42,6 +44,7 @@ Nominal values in `params.scad` are from datasheets. Caliper these and update:
 | caps feel too flush / want deeper recess | `cap_recess` 0.5 → 1.0 |
 | dish too shallow / dome too subtle | `dish_depth`, `dome_h` |
 | different layout | `variant` in `page_turner.scad`, or edit the `caps` table |
+| wider / rounder / flatter shell | `side_gap` (width), `r_plan_far`, `r_top`, `r_bot` |
 | lid won't snap / too tight | `snap_bump` 0.4 → 0.3, or `lid_fit` 0.2 → 0.3 |
 | lid loose | `snap_bump` 0.4 → 0.5 |
 | switch loose in pocket | `pocket_fit` 0.15 → 0.1 |

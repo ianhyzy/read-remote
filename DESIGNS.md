@@ -20,11 +20,11 @@ Sources: Kobo Remote reviews (Good e-Reader, The Gadgeteer, Digital Reviews, Cha
 
 ## The seven options
 
-All share the same base (XIAO + battery + wiring), the same 2 mm lid with recessed caps, and the same silent switch pockets. PREV always sits nearer the USB end (the battery dictates where the first switch can go); NEXT sits at the far end where the thumb rests. Render with `./render.sh <variant>`.
+All share the same pebble base (XIAO + battery + wiring), the same 3 mm lid with recessed caps, and the same silent switch pockets. The trigger variant flattens the far end to r6 so its end button has a flat wall. PREV always sits nearer the USB end (the battery dictates where the first switch can go); NEXT sits at the far end where the thumb rests. Render with `./render.sh <variant>`.
 
 | # | `variant` | NEXT | PREV | Tells them apart | Case L×W | Notes |
 |---|---|---|---|---|---|---|
-| 1 | `kobo` | 16.6 × 17 rounded square, **dished** | 10 mm **round dome** | size, shape, concave vs convex | 61 × 25 | Closest to the Kobo Remote. Strongest "which is which" cue. |
+| 1 | `kobo` (default) | 16.6 × 17, follows the rounded end, **dished** | 10 mm **round dome** | size, shape, concave vs convex | 61 × 25 | Closest to the Kobo Remote. Strongest "which is which" cue. |
 | 2 | `rocker` | far half of one 28 mm seesaw cap, dished | near end of same cap, raised dot | position + dot | 61 × 25 | One moving part, feels like a rocker. Small cross-talk risk: pressing one end loads the other dome ~10 %; test before committing. |
 | 3 | `dishdome` | 16.6 × 13 **dished** | 16.6 × 13 **domed** (peaks 0.3 mm above lid) | concave vs convex | 60 × 25 | Equal-size targets, no bar. Dome is findable under a blanket. |
 | 4 | `bars` | 16.6 × 19 flat | 16.6 × 9 flat | length | 64 × 25 | Oasis-style. Simplest to print. Weakest cue in the dark. |

@@ -32,8 +32,11 @@ preload     = 0.0;    // raise switch shelf to take up plunger slack (0.1 if cap
 // ---- Case ----
 wall        = 1.6;
 floor_t     = 1.6;
-lid_t       = 2.0;
-corner_r    = 3.0;
+lid_t       = 3.0;
+r_plan_usb  = 4.5;    // plan corner radius at the USB end (limited by the PCB corners)
+r_plan_far  = 10.0;   // plan corner radius at the button end (pebble end; <= outer width/2)
+r_top       = 2.5;    // lid top-edge fillet (<= lid_t)
+r_bot       = 3.0;    // base bottom-edge fillet; both get a 45deg blend at the bed so they print clean
 top_gap     = 0.3;    // USB shell top to lid underside
 side_gap    = 1.5;    // min wire space beside the PCB (each side)
 rail_w      = 0.8;    // PCB support rails along the long walls
@@ -57,4 +60,4 @@ dish_depth  = 0.7;          // concave "dish" cap: depth at centre
 dome_h      = 0.8;          // convex "dome" cap: rise at centre (peaks dome_h - cap_recess above the lid)
 dot         = [4.0, 2.5, 0.7];   // "dot" cap: bump base dia, top dia, height
 end_cap     = [8.0, 5.0, 1.2];   // trigger variant end button: width, height, protrusion past the wall
-lanyard_d   = 2.2;          // hole through the far end wall (0 = none)
+lanyard_d   = 2.2;          // hole through the far end wall, centred (0 = none)

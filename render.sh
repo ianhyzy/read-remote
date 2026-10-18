@@ -2,7 +2,7 @@
 # Export STLs and PNG previews for one variant: ./render.sh [variant]   (default: dishdome)
 set -e
 cd "$(dirname "$0")"
-V=${1:-dishdome}; S=page_turner.scad
+V=${1:-kobo}; S=page_turner.scad
 mkdir -p "stl/$V" "renders/$V"
 for p in base lid plunger_next plunger_prev; do
   openscad -q --backend=manifold -o "stl/$V/$p.stl" -D "variant=\"$V\"" -D "part=\"$p\"" $S || rm -f "stl/$V/$p.stl"   # a variant may have no plunger_prev
