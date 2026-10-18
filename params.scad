@@ -46,12 +46,15 @@ snap_len    = 5.0;
 snap_z      = 1.4;    // bump centre below lid underside
 pry_notch   = [8, 1.2];  // fingernail slot at the far end: width, depth
 
-// ---- Buttons (big recessed caps; width is computed to fill the lid) ----
-lid_frame   = 1.0;          // lid material between cap window and the lip
-cap_len     = 13.0;         // each cap's length along the case (Y)
-cap_gap     = 3.0;          // lid bar between the two caps
-cap_recess  = 0.5;          // cap top sits this far below the lid surface
+// ---- Buttons (layout chosen by `variant` in page_turner.scad) ----
+lid_frame   = 1.0;          // lid material between a cap window and the lip
+cap_gap     = 3.0;          // lid bar between caps
+cap_recess  = 0.5;          // flat cap top sits this far below the lid surface
+cap_r       = 1.5;          // cap corner radius
 flange_lip  = 1.0;          // under-lid retaining flange, each side
 flange_t    = 1.0;
-ridge       = [1.5, 1.0];   // "previous" cap ridge: width, height (peaks ridge-cap_recess above the lid)
-btn_start   = 1.2;          // button zone starts this far past the PCB end stops
+dish_depth  = 0.7;          // concave "dish" cap: depth at centre
+dome_h      = 0.8;          // convex "dome" cap: rise at centre (peaks dome_h - cap_recess above the lid)
+dot         = [4.0, 2.5, 0.7];   // "dot" cap: bump base dia, top dia, height
+end_cap     = [8.0, 5.0, 1.2];   // trigger variant end button: width, height, protrusion past the wall
+lanyard_d   = 2.2;          // hole through the far end wall (0 = none)
