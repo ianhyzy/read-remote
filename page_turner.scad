@@ -221,9 +221,9 @@ if (part == "exploded") { color("Khaki") base(); hw(); color("Wheat") translate(
 if (part == "section" || part == "section_mag") { x = part == "section" ? next_cap[0] : magnet_pos[1][0]; cut(x, "Khaki") base(); cut(x, "Wheat") translate([0, 0, z_ledge]) tray(); cut(x, "LightSteelBlue") lid(); cut(x, "Tomato") plungers(); cut(x, "DimGray") hw(); }
 if (part == "layout") {
   color("Khaki") base(); hw(); color("Wheat", 0.6) translate([0, 0, z_ledge]) tray(); color("Tomato", 0.5) plungers();
-  label("XIAO nRF52840", [0, pcb_setback + 13.5]); label("USB-C", [0, -4]);
-  label("reset", [reset_pos[0], pcb_setback + reset_pos[1] + 2.5]); label("LED", [led_pos[0], pcb_setback + led_pos[1] + 2.5]);
-  if (magnet[0] > 0) label("magnets (below PCB)", [0, pcb_setback + magnet_pos[0][1] + 2.8]);
+  label("XIAO nRF52840", [0, pcb_setback + 9]); label("USB-C", [0, -4]);
+  label("reset", [reset_pos[0], pcb_setback + reset_pos[1] + 2.5]); label("LED", [led_pos[0], pcb_setback + led_pos[1] - 2.5]);
+  if (magnet[0] > 0) label("magnets (below PCB)", [0, pcb_setback + magnet_pos[0][1] - 3.5]);
   label("antenna end / keepout", [0, y_pcb1 + 1.5]); label("battery under tray", [0, inner_l - 3]);
   if (len(caps) > 1) { label("PREV", caps[0]); label("NEXT", caps[1]); }
   else { label("NEXT (far end)", [0, caps[0][1] + 7]); label("PREV (near end)", [0, caps[0][1] - 7]); }
