@@ -2,7 +2,7 @@
 // Stack (bottom up): floor | PCB on rails (USB end) ; battery on floor under a drop-in switch tray (button end) | caps | lid
 include <params.scad>
 
-part    = "assembly";   // base | lid | tray | plunger_next | plunger_prev | cover | coupon_* | assembly | assembly_cover | assembly_stored | exploded | section | layout
+part    = "assembly";   // base | lid | tray | plunger_next | plunger_prev | cover | coupon_* | assembly | assembly_cover | assembly_stored | section | section_mag | exploded | layout
 variant = "kobo";       // kobo | rocker | dishdome | bars | sidebyside | dot
 $fn = 48;
 
@@ -48,7 +48,6 @@ H_tot    = outer[2];
 corners  = [for (sx = [-1, 1]) [sx*(outer[0]/2 - r_plan_usb), -wall + r_plan_usb, r_plan_usb],
             for (sx = [-1, 1]) [sx*(outer[0]/2 - r_plan_far), inner_l + wall - r_plan_far, r_plan_far]];
 snap_ys  = [inner_l*0.25, inner_l*0.75];
-cov_y0   = yp - max(po/2, 5) - fit - cov_margin;   // cover starts here (relative to inner USB wall)
 z_bump   = inner_h - finger_h + 0.7;             // snap bump / groove centre
 
 // corner-fit checks: point (x,y) must lie inside a plan corner arc of radius r about (cx,cy)
@@ -113,45 +112,48 @@ module base() difference() {
   for (s = [-1, 1], y = snap_ys)   // grooves for the lid's snap fingers
     translate([s*inner_w/2 - (s > 0 ? 0 : snap_bump + 0.1), y - snap_len/2 - 0.3, z_bump - 0.7]) cube([snap_bump + 0.1, snap_len + 0.6, 1.4]);
   if (lanyard_d > 0) translate([0, inner_l - ledge_w - 1, lanyard_z]) rotate([-90, 0, 0]) cylinder(d = lanyard_d, h = r_plan_far + 2);
-  translate([0, 0, inner_h - 1.0]) linear_extrude(1.0) cov_ring2d(0.5, -cov_rib - 0.05);                     // top groove: button end
-  translate([0, inner_l, -floor_t + cov_groove_z - 0.5]) mirror([0, 1, 0]) linear_extrude(1.0) cov_ring2d(0.5, -cov_rib - 0.05);   // bottom groove: palm end
+  for (z = [-floor_t + cov_groove_z - 0.5, inner_h - 1.0], e = [0, 1])   // cover grooves: both faces, both ends
+    translate([0, e*inner_l, z]) mirror([0, e, 0]) linear_extrude(1.0) cov_end_ring2d(0.5, -cov_rib - 0.05);
   translate([-pry_notch[0]/2, inner_l - 0.5, inner_h - pry_notch[1]]) cube([pry_notch[0], wall + 2, 5]);
 }
 
-// ---------- reversible cover ----------
-module cov_region2d(o) intersection() { offset(o) plan2d(); translate([-100, cov_y0 - 1]) square([200, 200]); }
-module cov_ring2d(o_out, o_in) difference() { cov_region2d(o_out); cov_region2d(o_in); }
-module cover() {   // z=0 outer face, inner face at z=cov_t, skirt up to cov_t+cov_skirt_h. Exported outer-face UP (see dispatch)
-  ramp_a = atan((cov_t - cov_edge) / cov_ramp);
+// ---------- reversible full-length cover ----------
+module cov_end2d(o) intersection() { offset(o) plan2d(); translate([-100, inner_l + wall - cov_end_len]) square([200, 100]); }   // far-end region
+module cov_end_ring2d(o_out, o_in) difference() { cov_end2d(o_out); cov_end2d(o_in); }
+module cov_ends() { children(); translate([0, inner_l, 0]) mirror([0, 1, 0]) children(); }   // both ends (plan is end-symmetric)
+module cover() {   // z=0 outer face, inner face at z=cov_t, skirts up to cov_t+cov_skirt_h. Exported outer-face UP (see dispatch)
   difference() {
-    hull() {   // plate + skirt with a 1 mm 45deg edge on the outer face
-      linear_extrude(0.01) cov_region2d(cov_skirt_t + cov_fit - 1.0);
-      translate([0, 0, 1.0]) linear_extrude(cov_t + cov_skirt_h - 1.0) cov_region2d(cov_skirt_t + cov_fit);
-    }
-    translate([0, 0, cov_t]) linear_extrude(cov_skirt_h + 1) cov_region2d(cov_fit);          // the case
-    translate([-100, -100, -1]) cube([200, 100 + cov_y0, 20]);                                 // open end, straight cut
-    translate([0, 0, cov_t + cov_skirt_h - 0.6]) linear_extrude(1) cov_ring2d(cov_fit + 0.6, cov_fit - 0.01);  // lead-in
-    // ramp: outer face rises toward the open end so the plate thins from cov_t to cov_edge
-    translate([0, cov_y0 + cov_ramp, 0]) rotate([-ramp_a, 0, 0]) translate([-100, -200, -50]) cube([200, 200, 50]);
-    // notch in the end skirt: clears the USB opening when parked at the palm end
-    translate([-cov_notch/2, inner_l + wall - r_plan_far, cov_t]) cube([cov_notch, 50, 20]);
-    // magnet pockets in the plate (0.6 skin on the outer face, roof toward the inside)
-    if (magnet[0] > 0) for (sx = [-1, 1]) translate([sx*magnet_x, inner_l + wall - r_plan_far - 1, 0.6]) cylinder(d = magnet[0] + 2*magnet_fit, h = magnet[1] + 0.2);
-    // skirt ends feather to zero height over cov_skirt_taper
-    translate([0, cov_y0 + cov_skirt_taper, cov_t + cov_skirt_h]) rotate([atan(cov_skirt_h / cov_skirt_taper), 0, 0]) translate([-100, -200, 0]) cube([200, 200, 50]);
-  }
-  zr = cov_t + cov_groove_z;   // rib: stepped so it enters from either direction; only where the skirt is full height
-  intersection() {
-    translate([-100, cov_y0 + cov_skirt_taper + 1, -1]) cube([200, 200, 20]);
     union() {
-      translate([0, 0, zr - 0.2]) linear_extrude(0.4) cov_ring2d(cov_fit + 0.01, cov_fit - cov_rib);
-      translate([0, 0, zr - 0.5]) linear_extrude(0.3) cov_ring2d(cov_fit + 0.01, cov_fit - cov_rib/2);
-      translate([0, 0, zr + 0.2]) linear_extrude(0.3) cov_ring2d(cov_fit + 0.01, cov_fit - cov_rib/2);
+      hull() {   // plate with a 1 mm 45deg edge on the outer face
+        linear_extrude(0.01) offset(cov_skirt_t + cov_fit - 1.0) plan2d();
+        translate([0, 0, 1.0]) linear_extrude(cov_t - 1.0) offset(cov_skirt_t + cov_fit) plan2d();
+      }
+      cov_ends() translate([0, 0, cov_t - 0.01]) linear_extrude(cov_skirt_h + 0.01) cov_end_ring2d(cov_skirt_t + cov_fit, cov_fit);   // end skirts
+      zr = cov_t + cov_groove_z;   // stepped rib, where the skirt is full height
+      cov_ends() intersection() {
+        translate([-100, inner_l + wall - cov_end_len + cov_skirt_taper + 1, -1]) cube([200, 100, 20]);
+        union() {
+          translate([0, 0, zr - 0.2]) linear_extrude(0.4) cov_end_ring2d(cov_fit + 0.01, cov_fit - cov_rib);
+          translate([0, 0, zr - 0.5]) linear_extrude(0.3) cov_end_ring2d(cov_fit + 0.01, cov_fit - cov_rib/2);
+          translate([0, 0, zr + 0.2]) linear_extrude(0.3) cov_end_ring2d(cov_fit + 0.01, cov_fit - cov_rib/2);
+        }
+      }
     }
+    cov_ends() {
+      translate([-cov_notch/2, inner_l + wall - r_plan_far, cov_t]) cube([cov_notch, 50, 20]);   // USB / lanyard notch in each end skirt
+      // skirt feathers to zero height toward the middle
+      intersection() {   // only skirt material above the plate
+        translate([0, inner_l + wall - cov_end_len + cov_skirt_taper, cov_t + cov_skirt_h]) rotate([atan(cov_skirt_h / cov_skirt_taper), 0, 0]) translate([-100, -cov_skirt_taper - 0.5, 0]) cube([200, cov_skirt_taper + 0.5, 50]);   // bounded to this end's taper zone
+        translate([-100, -100, cov_t]) cube([200, 300, 50]);
+      }
+      translate([0, 0, cov_t + cov_skirt_h - 0.6]) linear_extrude(1) cov_end_ring2d(cov_fit + 0.6, cov_fit - 0.01);   // lead-in
+    }
+    for (pp = [reset_pos, led_pos]) translate([pp[0], pcb_setback + pp[1], -1]) cylinder(d = 2.2, h = 10);   // reset / LED pinholes (travel position)
+    if (magnet[0] > 0) for (sx = [-1, 1]) translate([sx*magnet_x, -wall + r_plan_usb + 1, 0.6]) cylinder(d = magnet[0] + 2*magnet_fit, h = magnet[1] + 0.2);   // magnets at the palm end
   }
 }
-module cover_on_top() translate([0, 0, inner_h + lid_t + cov_t]) mirror([0, 0, 1]) cover();
-module cover_stored() translate([0, inner_l, -floor_t - cov_t]) mirror([0, 1, 0]) cover();   // parked under the palm (USB) end
+module cover_on_top() translate([0, 0, inner_h + lid_t + cov_t]) mirror([0, 0, 1]) cover();   // travel
+module cover_stored() translate([0, 0, -floor_t - cov_t]) cover();                            // reading: flat underneath
 
 // ---------- switch tray (drop-in; solder the switches on it before installing) ----------
 module tray_pocket(x, y) {

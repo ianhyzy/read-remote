@@ -61,19 +61,16 @@ pry_notch   = [6, 1.2];  // fingernail slot in the base rim at the far end: widt
 lanyard_d   = 2.2;    // hole through the far end wall, centred (0 = none)
 lanyard_z   = 6.5;    // above the inner floor: between the two cover skirts, above the tray (which gets a notch)
 
-// ---- Reversible cover: clips over the button end from above (travel) or below (grip / storage) ----
-cov_t       = 3.0;    // plate thickness (= extra grip thickness when stored underneath)
+// ---- Reversible full-length cover: over the lid for travel, under the base as a flat grip while reading ----
+cov_t       = 3.0;    // plate thickness (= extra grip thickness when parked underneath)
 cov_skirt_h = 5.0;    // skirt depth down the case side
 cov_skirt_t = 1.2;
 cov_fit     = 0.15;   // skirt vs case wall, per side
 cov_rib     = 0.3;    // rib on the skirt / groove in the case
 cov_groove_z = 3.5;   // rib/groove centre, measured from each case face
-cov_margin  = 3.0;    // cover starts this far before the PREV cap
-cov_ramp    = 10.0;   // plate thins over this length to the open end, so it flows into the body
-cov_edge    = 0.8;    // plate thickness at the open end
-cov_skirt_taper = 9.0;   // skirt height feathers to zero over this length at the open end
-cov_notch   = 16.0;   // gap in the end skirt so the USB opening stays clear when the cover is parked at the palm end
-
+cov_end_len = 22.0;   // skirt (and case groove) runs this far in from each end; the middle is skirt-free so the ends flex
+cov_skirt_taper = 9.0;   // skirt height feathers to zero over this length where it ends
+cov_notch   = 16.0;   // gap in each end skirt so the USB opening stays clear
 // ---- Magnets (optional, in the cover plate, printed in place: pause at the roof layer, drop them in) ----
 magnet      = [6.0, 1.5];          // dia, thickness (0 dia = none). Two N52 6x1.5 discs, same pole up
 magnet_x    = 5.0;                 // +/- X in the cover plate, just short of the rounded end

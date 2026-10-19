@@ -14,7 +14,7 @@ Outer size with nominal parts: **26 × 64 × 17 mm**, pebble-shaped (r10 ends, 2
 | `tray` | drop-in plate carrying both switches | as exported, pockets up |
 | `plunger_next` | big dished cap | as exported, cap up |
 | `plunger_prev` | small domed cap | as exported, cap up |
-| `cover` | reversible clip-on cover: over the buttons for travel, parked under the palm end as a grip while reading | as exported, outer face up (the inner face bridges between the skirt walls) |
+| `cover` | full-length reversible shell: over the lid for travel, under the base while reading | as exported, outer face up, end skirts on the bed (the plate bridges between them) |
 | `coupon_base/lid/tray` | the button end of the case only: both windows, both pockets, the rear snap fingers, tray ledge | same as the full parts |
 
 **Print the coupon first** with both caps and real switches. It tests `fit`, `snap_bump`, `pocket_fit`, `tray_fit` and the cap stack height in a fraction of the time of the full set.
@@ -45,14 +45,14 @@ Nominal values in `params.scad` are from datasheets. Caliper these and update:
 The model asserts that the PCB corners clear the rounded USB-end cavity and that the battery fits in its bay; if an assert fires it names the parameter to change.
 
 ## Cover
-A U-shaped shell with a 0.3 mm rib inside its skirt. Two positions:
-- **Travel**: over the button end, on top. The rib snaps into a groove 3.5 mm below the top face. Both buttons are covered.
-- **Reading**: parked under the palm (USB) end. The rib snaps into a groove 3.5 mm above the bottom face, adding 3 mm of thickness where your palm wraps, with the weight toward the hand. A notch in the end skirt keeps the USB opening clear.
+A full-length shell, 3 mm thick, with a 1.2 mm skirt around each end (the middle 20 mm of each side is skirt-free so the ends flex). A 0.3 mm rib inside each end skirt snaps into a groove 3.5 mm from the case face. Grooves are cut on both faces at both ends, so:
+- **Travel**: over the lid. Both buttons covered; pinholes line up with the reset and LED holes.
+- **Reading**: under the base. The bottom stays flat (so it sits on a table), the whole remote is 3 mm thicker, and the magnets face out.
 
-The plate ramps from 3 mm to 0.8 mm and the skirt feathers out over the last 9 mm, so the open end flows into the body. Too tight or loose: `cov_fit`, `cov_rib`.
+A 16 mm notch in each end skirt keeps the USB opening clear. Too tight or loose: `cov_fit`, `cov_rib`; skirt length and feather: `cov_end_len`, `cov_skirt_taper`.
 
 ## Magnets (optional, in the cover, printed in place)
-Two 6 × 1.5 mm N52 discs sit in closed pockets in the cover plate, 0.6 mm under its outer face, so the parked cover sticks the remote to a lamp base, bed frame, or a folio with a magnet. The cover prints outer-face up: in Bambu Studio add **Pause at layer** at height 7.4 mm (skirt 5.0 + 0.7 inner skin + 1.7 pocket; layer 74 at 0.1 mm). When it pauses, drop the magnets in with the **same pole up**, resume. Set `magnet = [0, 0]` to omit them.
+Two 6 × 1.5 mm N52 discs sit in closed pockets in the cover plate at the USB end, 0.6 mm under its outer face, so the parked cover sticks the remote to a lamp base, bed frame, or a folio with a magnet. The cover prints outer-face up: in Bambu Studio add **Pause at layer** at height 7.4 mm (skirt 5.0 + 0.7 inner skin + 1.7 pocket; layer 74 at 0.1 mm). When it pauses, drop the magnets in with the **same pole up**, resume. Set `magnet = [0, 0]` to omit them.
 
 ## Printing (Bambu P1S)
 - PLA, 0.4 nozzle, **0.10 mm layers** (so the switch shelf and lid heights land on layer boundaries), 3 walls, no supports.
