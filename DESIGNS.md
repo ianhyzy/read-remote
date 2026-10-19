@@ -18,9 +18,9 @@ Sources: Kobo Remote reviews (Good e-Reader, The Gadgeteer, Digital Reviews, Cha
 5. **Tactile markers:** industry practice (Sony, patents) is a single dot or pip on one button, or concave vs convex halves, not bars. A raised dot on F/J keys is the most familiar version.
 6. **A thumb dish beats a flat pad**: the Kobo and clip-on clickers all dish the forward button so the thumb self-centres.
 
-## The seven options
+## The options
 
-All share the same pebble base (XIAO + battery + wiring), the same 3 mm lid with recessed caps, and the same silent switch pockets. The trigger variant flattens the far end to r6 so its end button has a flat wall. PREV always sits nearer the USB end (the battery dictates where the first switch can go); NEXT sits at the far end where the thumb rests. Render with `./render.sh <variant>`.
+All share the same pebble base (XIAO + battery + wiring), the same 3 mm lid with recessed caps, and the same drop-in switch tray. The earlier end-trigger variant was dropped when the battery moved to the far end. PREV always sits nearer the USB end (the battery dictates where the first switch can go); NEXT sits at the far end where the thumb rests. Render with `./render.sh <variant>`.
 
 | # | `variant` | NEXT | PREV | Tells them apart | Case L×W | Notes |
 |---|---|---|---|---|---|---|
@@ -29,7 +29,6 @@ All share the same pebble base (XIAO + battery + wiring), the same 3 mm lid with
 | 3 | `dishdome` | 16.6 × 13 **dished** | 16.6 × 13 **domed** (peaks 0.3 mm above lid) | concave vs convex | 60 × 25 | Equal-size targets, no bar. Dome is findable under a blanket. |
 | 4 | `bars` | 16.6 × 19 flat | 16.6 × 9 flat | length | 64 × 25 | Oasis-style. Simplest to print. Weakest cue in the dark. |
 | 5 | `sidebyside` | right bar, dished | left bar, domed | left/right + concave/convex | 56 × 33 | Wider, shorter, more "remote"-like; handedness fixed at print time. |
-| 6 | `trigger` | one 16.6 × 18 dished pad on top | 8 × 5 button in the **far end wall**, index finger | different finger, different face | 57 × 25 | Impossible to confuse. Back needs a deliberate squeeze. Most parts. |
-| 7 | `dot` | 16.6 × 13 flat | 16.6 × 13 with a **centre dot** | one dot | 60 × 25 | Keyboard F/J approach. Minimal, both faces smooth except the dot. |
+| 6 | `dot` | 16.6 × 13 flat | 16.6 × 13 with a **centre dot** | one dot | 60 × 25 | Keyboard F/J approach. Minimal, both faces smooth except the dot. |
 
 Mix and match: every cap style (`flat`, `dish`, `dome`, `dot`) works with every layout; edit the `caps` table in `page_turner.scad`.
