@@ -5,6 +5,7 @@
 xiao        = [17.8, 21.0, 1.0];   // PCB width (X), length (Y, USB edge first), PCB thickness
 xiao_comp_h = 3.3;                 // tallest top-side part (USB-C shell) above PCB top
 usb         = [9.0, 3.3];          // USB-C shell width, height (sits on PCB top)
+usb_len     = 7.3;                 // USB-C shell length along the PCB
 usb_overhang = 1.0;                // how far the shell nose sticks past the PCB edge (measure)
 usb_plug    = [12.5, 7.0];         // cable overmold clearance (W x H): the plug body enters the case ~3.5 mm before the shell seats
 usb_flare   = 1.2;                 // 45deg lead-in on the outer face, each side
@@ -59,25 +60,28 @@ snap_bump   = 0.3;    // finger bump protrusion
 snap_len    = 5.0;
 pry_notch   = [6, 1.2];  // fingernail slot in the base rim at the far end: width, depth
 lanyard_d   = 2.2;    // hole through the far end wall, centred (0 = none)
-lanyard_z   = 6.5;    // above the inner floor: between the two cover skirts, above the tray (which gets a notch)
+lanyard_z   = 2.5;    // above the inner floor (under the tray, in the empty end zone)
 
-// ---- Hood: covers the button half for travel; parks backwards on the lowered palm half while reading ----
-cov_t       = 3.0;    // plate thickness = how far the palm half is lowered, so the parked hood sits flush
-cov_skirt_h = 5.0;    // skirt depth down the case side
-cov_skirt_t = 1.2;
-cov_fit     = 0.15;   // skirt vs case wall, per side
-cov_rib     = 0.3;    // rib on the skirt / groove in the case
-cov_groove_z = 3.5;   // rib/groove centre, measured from the face the hood sits on
-cov_notch   = 16.0;   // gap in the end skirt so the USB opening stays clear when parked
-neck_z      = 4.3;    // palm-half wall is inset by the skirt above this height (inner-floor coords) so the parked skirt is flush
-finger_h_b  = 4.5;    // shorter snap fingers on the palm-half lid (they must stay inside the inset band)
+// ---- Power cutoff: SS12D00G3 slide switch in the battery + lead, side wall, USB half ----
+psw         = [8.6, 3.6, 3.5];     // body: length along the slide (Y), depth along the handle (X), height (Z)  (MEASURE)
+psw_handle  = [2.0, 1.5, 3.0];     // handle: along the slide, across, length past the body (G3 = 3.0)
+psw_travel  = 2.0;                 // slide throw (SS12D00: 2 +/- 0.3)
+psw_y       = 12.0;                // travel centre from the inner USB wall (stay in the USB half, away from the antenna)
+psw_side    = 1;                   // +1 right wall, -1 left wall (looking from the USB end, buttons up)
+psw_lift    = 2.0;                 // body bottom above the PCB top (room for the GND wire and solder underneath)
+psw_fit     = 0.15;                // body in its pocket, per side
+knob        = [6.0, 4.0, 1.5];     // tile: along the slide, tall, corner radius; thickness = wall (flush)
+knob_flange = 1.0;                 // inner flange thickness (sits between the wall and the switch body)
+knob_fit    = 0.15;                // tile vs window, per side
+knob_pocket_fit = 0.1;             // handle pocket, per side (press fit)
+knob_groove = [0.6, 0.3];          // fingernail groove across the tile: width, depth
 // ---- Magnets (optional, in the base floor under the PCB, printed in place: pause at the roof layer, drop them in) ----
 magnet      = [0, 0];               // dia, thickness (0 dia = none). Two N52 6x1.5 discs, same pole up
 magnet_pos  = [[-4.5, 17.5], [4.5, 17.5]];   // X from centre, Y from PCB USB edge: under the PCB's antenna half, clear of pads
 magnet_fit  = 0.15;                // radial; pocket is magnet thickness + 0.2 tall
 
 // ---- Buttons (layout chosen by `variant` in page_turner.scad) ----
-cap_shift   = 0.0;          // keep 0: the hood must cover both caps and be exactly half the case
+cap_shift   = 2.5;          // slide both caps this far toward the palm (USB end); 0 = caps at the far end
 lid_frame   = 1.0;          // lid material between a cap window and the lip
 cap_gap     = 3.0;          // lid bar between caps
 cap_recess  = 1.0;          // flat cap top sits this far below the lid surface (PREV dome apex ends up 0.2 below it)

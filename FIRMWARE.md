@@ -23,7 +23,7 @@ Pairings misbehaving? Flash the `settings_reset` artifact the same way, then fla
 On the e-reader, Bluetooth settings → pair **Read Remote**. ZMK keeps up to 5 bonds; it reconnects to the last one.
 
 ## Travel lock
-Hold both buttons for 1–4 s and release: the buttons are ignored until you do it again. Use it before the remote goes in a bag with the e-reader. The lock survives sleep and power off.
+The case has a hard power switch (side slider) for travel; that is the normal way to stow it. The firmware lock remains as a backup: hold both buttons for 1–4 s and release, and the buttons are ignored until you do it again. The lock survives sleep and power off.
 
 Why it matters: when the remote is awake and paired, every press sends a key, and a Bluetooth key press will usually wake the e-reader's screen and turn a page. After 30 min idle it deep-sleeps; the first press only wakes it (that press is lost, reconnect takes about a second), and every press after that turns pages again. Power off behaves the same way: any press wakes it. So without the lock, a jostled bag turns pages.
 
