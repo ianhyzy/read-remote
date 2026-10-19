@@ -73,7 +73,7 @@ Tuning: `knob_fit` (tile in window), `knob_pocket_fit` (handle press fit; add a 
 | knob binds in its window | `knob_fit` 0.15 → 0.25 |
 | knob loose on the handle | `knob_pocket_fit` 0.1 → 0.05, or a drop of CA |
 | USB plug body doesn't fit | `usb_plug`, `usb_flare` |
-| want deeper button recess | `cap_recess` 0.5 → 1.0 |
+| want deeper / shallower button recess | `cap_recess` (0.5; 1.0 if it rides in a pocket switched on) |
 | dish too shallow / dome too subtle | `dish_depth`, `dome_h` |
 | buttons too far from the palm / too close | `cap_shift` (default 2.5 toward the USB end; 0 puts them at the far end) |
 | different layout | `variant`, or edit the `caps0` table |
@@ -94,7 +94,7 @@ Wire: NEXT switch → **D0** and **GND**, PREV switch → **D1** and **GND**. Us
 Reset: paperclip into the pinhole above the USB end. Double-press for the UF2 bootloader. The second small hole next to it shows the charge/status LED.
 
 ## Design notes
-- **Captured caps.** Each cap rests on its switch dome and is retained by a 1 mm flange under the lid. Travel stops on the switch; the cap sits 0.5 mm below the lid in a window with 0.25 mm clearance and a 0.4 mm chamfered edge, so plastic never meets plastic.
+- **Captured caps.** Each cap rests on its switch dome and is retained by a 1 mm flange under the lid. Travel stops on the switch; the cap sits 0.5 mm below the lid (the PREV dome peaks 0.3 mm proud) in a window with 0.25 mm clearance and a 0.4 mm chamfered edge, so plastic never meets plastic.
 - **Battery away from the antenna.** The pouch (foil) sits under the switch tray, 3 mm past the board end and 2 mm below the antenna plane, instead of directly under the chip antenna.
 - **PCB held three ways without glue.** Rails below; rounded cavity corners (front) and end stops (back) take plug insertion/removal loads; three lid pillars (two on bare PCB corners, one on the USB shell) stop it lifting.
 - **Snap fingers.** Four 1 mm × 5.5 mm fingers on the lid lip with relief slots, 0.3 mm bumps into wall grooves: ~1.5–2 % strain, inside PLA's elastic range. The continuous lip only locates.
