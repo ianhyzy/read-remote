@@ -6,6 +6,7 @@ ZMK config for the Seeed XIAO nRF52840 in the [case](../case/). Two direct-wired
 |---|---|---|
 | NEXT (big dished cap) | D0 ↔ GND | Page Down |
 | PREV (small domed cap) | D1 ↔ GND | Page Up; **hold 5 s = power off** |
+| both together | | **hold 3 s = bootloader** (flash mode) |
 
 KOReader turns pages on Page Down / Page Up out of the box. Most other reader apps do too.
 
@@ -13,7 +14,7 @@ KOReader turns pages on Page Down / Page Up out of the box. Most other reader ap
 GitHub Actions builds it on every push to `config/` or `build.yaml`. Open the latest run under **Actions**, download the `firmware` artifact, unzip to get `read_remote.uf2` (and `settings_reset.uf2`).
 
 ## Flash
-1. Plug in USB-C. Double-press the reset button through the pinhole; a `XIAO-SENSE` drive appears.
+1. Plug in USB-C. Hold **both buttons for 3 s**; a `XIAO-SENSE` drive appears. (Fallback, or on a blank board: double-press the reset button through the pinhole.)
 2. Drag the `.uf2` onto it. The drive ejects itself and the remote reboots.
 
 Pairings misbehaving? Flash the `settings_reset` artifact the same way, then flash `read_remote` again. That wipes all bonds.

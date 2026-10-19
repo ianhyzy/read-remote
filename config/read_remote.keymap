@@ -7,6 +7,9 @@
  *
  * Page Down / Page Up: KOReader maps these to next/previous page (as do most
  * reader apps). Remap in ZMK Studio or edit the bindings below.
+ *
+ * Hold PREV 5 s      = power off (any press wakes)
+ * Hold NEXT+PREV 3 s = reboot into the UF2 bootloader for flashing
  */
 
 / {
@@ -17,6 +20,22 @@
             flavor = "hold-preferred";
             tapping-term-ms = <5000>;   // tap = PREV, hold 5 s = power off
             bindings = <&soft_off>, <&kp>;
+        };
+        boot_ht: both_held_bootloader {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "hold-preferred";
+            tapping-term-ms = <3000>;   // both buttons held 3 s = UF2 bootloader (drag a .uf2 to flash)
+            bindings = <&bootloader>, <&none>;
+        };
+    };
+
+    combos {
+        compatible = "zmk,combos";
+        combo_boot {
+            timeout-ms = <80>;
+            key-positions = <0 1>;
+            bindings = <&boot_ht 0 0>;
         };
     };
 
