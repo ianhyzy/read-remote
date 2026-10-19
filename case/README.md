@@ -2,20 +2,21 @@
 
 3D-printable case for a two-button ZMK page-turner remote: Seeed XIAO nRF52840 + 402025 LiPo + two 6×6×5 silent tactile switches. Hand-wired, no PCB. Everything drops in from the top; no glue.
 
-Outer size with nominal parts: **26 × 64 × 17 mm**, pebble-shaped (r10 ends, 2.5 mm rounded top edge, 3 mm rounded bottom edge). Default button layout is `kobo`: big dished NEXT at the far end, small domed PREV below it. Five other layouts are built in (`variant` in `page_turner.scad`); see [DESIGNS.md](DESIGNS.md).
+Outer size with nominal parts: **26 × 69 × 17 mm** at the button half; the palm half is 3 mm lower and 1.35 mm narrower so the travel hood parks on it flush. Pebble-shaped (r10 ends, rounded edges). The default layout is `kobo` (big dished NEXT at the far end, small domed PREV below it). Five other layouts are built in (`variant` in `page_turner.scad`); see [DESIGNS.md](DESIGNS.md).
 
 ![layout](renders/kobo/layout.png) ![section](renders/kobo/section.png)
 
-## Printed parts (6, plus a 3-piece fit coupon)
+## Printed parts (7, plus a 3-piece fit coupon)
 | part | what | print orientation |
 |---|---|---|
-| `base` | shell with PCB rails, battery bay, tray ledge | as exported, open side up |
-| `lid` | top with lip, 4 snap fingers, 3 PCB hold-down pillars | exported **top-face down** (fingers/pillars point up) |
+| `base` | shell with PCB rails, battery bay, tray ledge; palm half lower and inset | as exported, open side up |
+| `lid_front` | button-half lid: cap windows, 2 snap fingers | exported **top-face down** |
+| `lid_back` | palm-half lid, 3 mm lower: reset/LED pinholes, PCB hold-down pillars, 2 snap fingers | exported **top-face down** |
 | `tray` | drop-in plate carrying both switches | as exported, pockets up |
+| `cover` | the hood: over the buttons for travel, parked backwards on the palm half while reading | as exported, outer face up, skirt on the bed (the plate bridges between the skirt walls) |
 | `plunger_next` | big dished cap | as exported, cap up |
 | `plunger_prev` | small domed cap | as exported, cap up |
-| `cover` | full-length reversible shell: over the lid for travel, under the base while reading | as exported, outer face up, end skirts on the bed (the plate bridges between them) |
-| `coupon_base/lid/tray` | the button end of the case only: both windows, both pockets, the rear snap fingers, tray ledge | same as the full parts |
+| `coupon_base/lid/tray` | the button end only, for fit testing | same as the full parts |
 
 **Print the coupon first** with both caps and real switches. It tests `fit`, `snap_bump`, `pocket_fit`, `tray_fit` and the cap stack height in a fraction of the time of the full set.
 
@@ -44,21 +45,18 @@ Nominal values in `params.scad` are from datasheets. Caliper these and update:
 
 The model asserts that the PCB corners clear the rounded USB-end cavity and that the battery fits in its bay; if an assert fires it names the parameter to change.
 
-## Cover
-A full-length shell, 3 mm thick, with a 1.2 mm skirt around each end (the middle 20 mm of each side is skirt-free so the ends flex). A 0.3 mm rib inside each end skirt snaps into a groove 3.5 mm from the case face. Grooves are cut on both faces at both ends, so:
-- **Travel**: over the lid. Both buttons covered; pinholes line up with the reset and LED holes.
-- **Reading**: under the base. The bottom stays flat (so it sits on a table), the whole remote is 3 mm thicker, and the magnets face out.
+## Hood
+A half-length shell (3 mm plate, 1.2 mm skirt) with a 0.3 mm rib inside the skirt that snaps into a groove in the base wall. Two positions:
+- **Travel**: over the button half. Both buttons covered. Its open end butts against the step in the lid.
+- **Reading**: turned around and parked on the palm half, which is exactly one hood lower and one skirt narrower, so the top and sides come out flush and the bottom stays flat. Pinholes line up with reset and LED; a notch in the end skirt keeps USB usable.
 
-A 16 mm notch in each end skirt keeps the USB opening clear. Too tight or loose: `cov_fit`, `cov_rib`; skirt length and feather: `cov_end_len`, `cov_skirt_taper`.
-
-## Magnets (optional, in the cover, printed in place)
-Two 6 × 1.5 mm N52 discs sit in closed pockets in the cover plate at the USB end, 0.6 mm under its outer face, so the parked cover sticks the remote to a lamp base, bed frame, or a folio with a magnet. The cover prints outer-face up: in Bambu Studio add **Pause at layer** at height 7.4 mm (skirt 5.0 + 0.7 inner skin + 1.7 pocket; layer 74 at 0.1 mm). When it pauses, drop the magnets in with the **same pole up**, resume. Set `magnet = [0, 0]` to omit them.
+Too tight or loose: `cov_fit`, `cov_rib`. The palm-half drop is `cov_t`; the neck inset follows `cov_skirt_t + cov_fit` automatically.
 
 ## Printing (Bambu P1S)
 - PLA, 0.4 nozzle, **0.10 mm layers** (so the switch shelf and lid heights land on layer boundaries), 3 walls, no supports.
 - Lid on the **smooth or cool plate**: it prints top-face down, and a textured plate would texture the top. Caps print top-up with **ironing** on for glossy tops.
 - Rounded bottom (base) and top (lid) edges start with a 45° blend at the bed; expect a faint facet line ~1 mm up.
-- All five parts fit one plate.
+- All parts fit one plate.
 
 ## Fit tuning
 | symptom | change |
@@ -84,7 +82,7 @@ Wire: NEXT switch → **D0** and **GND**, PREV switch → **D1** and **GND**. Us
 2. **Battery.** Solder its leads to BAT+ / BAT− on the XIAO's underside, Kapton over the joints. Lay the battery in the bay (the ring at the far end), lead end toward the PCB.
 3. **PCB.** Set the XIAO on the two rails, component side up, USB-C toward the end opening. It is captured in Y between the rounded cavity corners and the end stops; nothing else to do.
 4. **Tray.** Lower the tray onto the ledge ring; its front edge rests on the PCB end stops. Solder the switch wires to D0 / D1 / GND. The gap above the PCB is 9 mm, so there is plenty of room.
-5. **Caps and lid.** Put the lid face-down on the bench, drop the caps into their windows (flange up). Turn the loaded base over onto the lid (the PCB and tray have only a few tenths of play; the switches sit in their pockets) and press until the four fingers click. Flip the whole thing over.
+5. **Caps and lids.** Put `lid_front` face-down on the bench, drop the caps into their windows (flange up). Turn the loaded base over onto it (the tray and switches have only a few tenths of play) and press until its two fingers click. Flip over and press `lid_back` onto the palm half until its fingers click; its pillars land on the PCB.
 6. **Open** with a fingernail in the notch at the far end. Thread a lanyard through the hole in the far wall and knot it inside.
 
 Reset: paperclip into the pinhole above the USB end. Double-press for the UF2 bootloader. The second small hole next to it shows the charge/status LED.

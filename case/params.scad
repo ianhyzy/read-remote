@@ -61,23 +61,23 @@ pry_notch   = [6, 1.2];  // fingernail slot in the base rim at the far end: widt
 lanyard_d   = 2.2;    // hole through the far end wall, centred (0 = none)
 lanyard_z   = 6.5;    // above the inner floor: between the two cover skirts, above the tray (which gets a notch)
 
-// ---- Reversible full-length cover: over the lid for travel, under the base as a flat grip while reading ----
-cov_t       = 3.0;    // plate thickness (= extra grip thickness when parked underneath)
+// ---- Hood: covers the button half for travel; parks backwards on the lowered palm half while reading ----
+cov_t       = 3.0;    // plate thickness = how far the palm half is lowered, so the parked hood sits flush
 cov_skirt_h = 5.0;    // skirt depth down the case side
 cov_skirt_t = 1.2;
 cov_fit     = 0.15;   // skirt vs case wall, per side
 cov_rib     = 0.3;    // rib on the skirt / groove in the case
-cov_groove_z = 3.5;   // rib/groove centre, measured from each case face
-cov_end_len = 22.0;   // skirt (and case groove) runs this far in from each end; the middle is skirt-free so the ends flex
-cov_skirt_taper = 9.0;   // skirt height feathers to zero over this length where it ends
-cov_notch   = 16.0;   // gap in each end skirt so the USB opening stays clear
-// ---- Magnets (optional, in the cover plate, printed in place: pause at the roof layer, drop them in) ----
-magnet      = [6.0, 1.5];          // dia, thickness (0 dia = none). Two N52 6x1.5 discs, same pole up
-magnet_x    = 5.0;                 // +/- X in the cover plate, just short of the rounded end
+cov_groove_z = 3.5;   // rib/groove centre, measured from the face the hood sits on
+cov_notch   = 16.0;   // gap in the end skirt so the USB opening stays clear when parked
+neck_z      = 4.3;    // palm-half wall is inset by the skirt above this height (inner-floor coords) so the parked skirt is flush
+finger_h_b  = 4.5;    // shorter snap fingers on the palm-half lid (they must stay inside the inset band)
+// ---- Magnets (optional, in the base floor under the PCB, printed in place: pause at the roof layer, drop them in) ----
+magnet      = [0, 0];               // dia, thickness (0 dia = none). Two N52 6x1.5 discs, same pole up
+magnet_pos  = [[-4.5, 17.5], [4.5, 17.5]];   // X from centre, Y from PCB USB edge: under the PCB's antenna half, clear of pads
 magnet_fit  = 0.15;                // radial; pocket is magnet thickness + 0.2 tall
 
 // ---- Buttons (layout chosen by `variant` in page_turner.scad) ----
-cap_shift   = 2.5;          // slide both caps this far toward the palm (USB end); 0 = caps at the far end
+cap_shift   = 0.0;          // keep 0: the hood must cover both caps and be exactly half the case
 lid_frame   = 1.0;          // lid material between a cap window and the lip
 cap_gap     = 3.0;          // lid bar between caps
 cap_recess  = 1.0;          // flat cap top sits this far below the lid surface (PREV dome apex ends up 0.2 below it)
