@@ -105,7 +105,7 @@ module base() {
     if (end_btn) translate([-(end_cap[0]/2 + fit), inner_l - 1, end_z - end_cap[1]/2 - fit]) cube([end_cap[0] + 2*fit, wall + 2, end_cap[1] + 2*fit]);
   }
   intersection() {   // PCB rails + chamfered end stops, clipped to the rounded cavity
-    linear_extrude(inner_h) cavity2d();
+    linear_extrude(inner_h) offset(-0.01) cavity2d();   // -0.01 avoids coplanar preview artefacts
     for (s = [-1, 1]) {
       translate([s > 0 ? inner_w/2 - rail_w : -inner_w/2, 0, 0]) cube([rail_w, y_xiao1 + 1.2, z_pcb]);
       translate([s > 0 ? xiao[0]/2 - 2 : -inner_w/2, y_xiao1 + pocket_fit, z_pcb])
