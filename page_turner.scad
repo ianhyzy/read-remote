@@ -2,7 +2,7 @@
 // Stack (bottom up): floor | PCB on rails (USB end) ; battery on floor under a drop-in switch tray (button end) | caps | lid
 include <params.scad>
 
-part    = "assembly";   // base | lid | tray | plunger_next | plunger_prev | assembly | exploded | section | layout
+part    = "assembly";   // base | lid | tray | plunger_next | plunger_prev | coupon_base | coupon_lid | coupon_tray | assembly | exploded | section | layout
 variant = "kobo";       // kobo | rocker | dishdome | bars | sidebyside | dot
 $fn = 48;
 
@@ -37,7 +37,8 @@ caps0 =
 tail      = fit + lid_frame + lip_t + lid_fit;                          // cap end to inner far wall
 inner_l_caps = max([for (c = caps0) c[1] + c[3]/2]) + tail;
 inner_l   = max(inner_l_caps, y_batt1 + r_plan_far - wall);             // battery must end before the far-end arc
-shift     = inner_l - inner_l_caps;                                     // push the caps to the far end
+shift     = inner_l - inner_l_caps - cap_shift;                         // battery-driven slack, minus the user shift toward the palm
+assert(shift >= -0.01, "cap_shift too large: the PREV switch pocket would leave the tray");
 caps      = [for (c = caps0) [c[0], c[1] + shift, c[2], c[3], c[4], c[5], is_undef(c[6]) ? cap_r : c[6]]];
 yp        = yp0 + shift;
 sws       = variant == "rocker" ? [[0, yp], [0, yp + 18]] : [for (c = caps) [c[0], c[1]]];
@@ -100,6 +101,8 @@ module base() difference() {
           difference() { offset(0.5) cavity2d(); offset(-ledge_w) cavity2d(); }
           translate([-100, y_stop0 + stop_t - 0.01]) square([200, 200]);
         }
+        // magnet bosses under the PCB (pockets cut below)
+        if (magnet[0] > 0) for (mp = magnet_pos) translate([mp[0], pcb_setback + mp[1], -0.01]) cylinder(d = magnet[0] + 2*magnet_fit + 2, h = magnet[1] + 0.2 + 0.4 - 1.0 + 0.01);
         // PCB rails under the long edges, and full-height end stops (tray front also rests on these)
         for (s = [-1, 1]) {
           translate([s*(xiao[0]/2 - 0.4) - 0.6, 1.5, -0.01]) cube([1.2, y_pcb1 - 1.0, z_pcb + 0.01]);
@@ -109,6 +112,8 @@ module base() difference() {
     }
   }
   usb_funnel();
+  if (magnet[0] > 0) for (mp = magnet_pos)   // pocket floor 0.6 above the bed, roof 0.4 thick
+    translate([mp[0], pcb_setback + mp[1], -floor_t + 0.6]) cylinder(d = magnet[0] + 2*magnet_fit, h = magnet[1] + 0.2);
   for (s = [-1, 1], y = snap_ys)   // grooves for the lid's snap fingers
     translate([s*inner_w/2 - (s > 0 ? 0 : snap_bump + 0.1), y - snap_len/2 - 0.3, z_bump - 0.7]) cube([snap_bump + 0.1, snap_len + 0.6, 1.4]);
   if (lanyard_d > 0) translate([0, inner_l - ledge_w - 1, 2.5]) rotate([-90, 0, 0]) cylinder(d = lanyard_d, h = r_plan_far + 2);
@@ -155,6 +160,7 @@ module lid() difference() {
     }
   }
   translate([reset_pos[0], pcb_setback + reset_pos[1], inner_h - 1]) cylinder(d = reset_hole_d, h = lid_t + 2);
+  if (led_hole_d > 0) translate([led_pos[0], pcb_setback + led_pos[1], inner_h - 1]) cylinder(d = led_hole_d, h = lid_t + 2);
 }
 
 // ---------- caps (printed top-up; z=0 is flange underside) ----------
@@ -185,6 +191,8 @@ module hw() {
   color("DarkSeaGreen") translate([-xiao[0]/2, pcb_setback, z_pcb]) cube([xiao[0], xiao[1], xiao[2]]);
   color("Silver") translate([-usb[0]/2, pcb_setback - usb_overhang, z_pcb_top]) cube([usb[0], 7.3, usb[1]]);
   color("Gold") translate([reset_pos[0], pcb_setback + reset_pos[1], z_pcb_top]) cylinder(d = 2.5, h = 1.5);
+  color("Red") translate([led_pos[0], pcb_setback + led_pos[1], z_pcb_top]) cylinder(d = 1.6, h = 0.6);
+  if (magnet[0] > 0) color("Silver") for (mp = magnet_pos) translate([mp[0], pcb_setback + mp[1], -floor_t + 0.7]) cylinder(d = magnet[0], h = magnet[1]);
   color("Tan") translate([-xiao[0]/2, y_pcb1 - 3, z_pcb_top]) cube([xiao[0], 3, 1]);
   color("SteelBlue") translate([-batt[0]/2, y_batt0 + batt_fit, 0]) cube([batt[0], batt[1], batt[2]]);
   for (s = sws) {
@@ -196,20 +204,28 @@ module plungers(dz = 0) for (c = caps) translate([c[0], c[1], inner_h - flange_t
 module label(t, p, z = 30) color("Black") translate([p[0], p[1], z]) linear_extrude(0.5) text(t, size = 2.2, halign = "center", valign = "center");
 module cut(x, c) color(c) mirror([1, 0]) rotate(90) projection(cut = true) rotate([0, 90, 0]) translate([-x, 0, 0]) children();
 
+// ---------- fit coupon: the button end only (both caps, both pockets, the rear snap fingers, tray on its ledge) ----------
+y_cpn = yp - max(po/2, 5) - 2;
+module coupon(part_mod) intersection() { children(); translate([-100, y_cpn, -50]) cube([200, 200, 100]); }
+
 // ---------- dispatch ----------
 if (part == "base") translate([0, 0, floor_t]) base();
 if (part == "lid") mirror([0, 0, 1]) translate([0, 0, -inner_h - lid_t]) lid();   // printed top-down
 if (part == "tray") tray();
+if (part == "coupon_base") translate([0, -y_cpn, floor_t]) coupon() base();
+if (part == "coupon_lid") mirror([0, 0, 1]) translate([0, -y_cpn, -inner_h - lid_t]) coupon() lid();
+if (part == "coupon_tray") translate([0, -y_cpn, 0]) coupon() tray();
 if (part == "plunger_next") plunger(next_cap);
 if (part == "plunger_prev") if (!is_undef(prev_cap)) plunger(prev_cap);
 if (part == "assembly") { color("Khaki") base(); color("Wheat") translate([0, 0, z_ledge]) tray(); color("LightSteelBlue", 0.7) lid(); color("Tomato") plungers(); hw(); }
 if (part == "exploded") { color("Khaki") base(); hw(); color("Wheat") translate([0, 0, z_ledge + 10]) tray(); translate([0, 0, 24]) color("LightSteelBlue") lid(); color("Tomato") plungers(36); }
-if (part == "section") { x = next_cap[0]; cut(x, "Khaki") base(); cut(x, "Wheat") translate([0, 0, z_ledge]) tray(); cut(x, "LightSteelBlue") lid(); cut(x, "Tomato") plungers(); cut(x, "DimGray") hw(); }
+if (part == "section" || part == "section_mag") { x = part == "section" ? next_cap[0] : magnet_pos[1][0]; cut(x, "Khaki") base(); cut(x, "Wheat") translate([0, 0, z_ledge]) tray(); cut(x, "LightSteelBlue") lid(); cut(x, "Tomato") plungers(); cut(x, "DimGray") hw(); }
 if (part == "layout") {
   color("Khaki") base(); hw(); color("Wheat", 0.6) translate([0, 0, z_ledge]) tray(); color("Tomato", 0.5) plungers();
-  label("XIAO nRF52840", [0, pcb_setback + 11]); label("USB-C", [0, -4]);
-  label("reset pinhole", [reset_pos[0], pcb_setback + reset_pos[1] + 2.5]);
-  label("antenna end", [0, y_pcb1 - 1.5]); label("battery under tray", [0, y_batt0 + 4]);
+  label("XIAO nRF52840", [0, pcb_setback + 13.5]); label("USB-C", [0, -4]);
+  label("reset", [reset_pos[0], pcb_setback + reset_pos[1] + 2.5]); label("LED", [led_pos[0], pcb_setback + led_pos[1] + 2.5]);
+  if (magnet[0] > 0) label("magnets (below PCB)", [0, pcb_setback + magnet_pos[0][1] + 2.8]);
+  label("antenna end / keepout", [0, y_pcb1 + 1.5]); label("battery under tray", [0, inner_l - 3]);
   if (len(caps) > 1) { label("PREV", caps[0]); label("NEXT", caps[1]); }
   else { label("NEXT (far end)", [0, caps[0][1] + 7]); label("PREV (near end)", [0, caps[0][1] - 7]); }
 }

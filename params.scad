@@ -11,6 +11,8 @@ usb_flare   = 1.2;                 // 45deg lead-in on the outer face, each side
 pcb_setback = 3.3;                 // PCB USB edge to inner end wall (clears the r10 cavity corners; plug reaches through)
 reset_pos   = [4.5, 2.5];          // reset button: X from PCB centre, Y from USB edge (MEASURE)
 reset_hole_d = 2.0;                // pinhole diameter in lid
+led_pos     = [-4.5, 5.0];         // charge/status LED: X from PCB centre, Y from USB edge (MEASURE; 0 dia to omit)
+led_hole_d  = 1.5;                 // light-pipe hole in the lid above it
 antenna_keepout = 3.0;             // empty zone past the PCB's far (antenna) edge (informational; see DESIGNS.md)
 pad_free_end = 2.0;                // bare PCB at the antenna-end corners where the lid pillars land (no castellations there)
 
@@ -58,7 +60,13 @@ snap_len    = 5.0;
 pry_notch   = [6, 1.2];  // fingernail slot in the base rim at the far end: width, depth
 lanyard_d   = 2.2;    // hole through the far end wall, centred (0 = none)
 
+// ---- Magnets (optional, printed in place: pause at the roof layer, drop them in) ----
+magnet      = [6.0, 1.5];          // dia, thickness (0 dia = none). Two N52 6x1.5 discs, same pole up
+magnet_pos  = [[-4.5, 17.5], [4.5, 17.5]];   // X from centre, Y from PCB USB edge: under the PCB's antenna half, clear of pads
+magnet_fit  = 0.15;                // radial; pocket is magnet thickness + 0.2 tall
+
 // ---- Buttons (layout chosen by `variant` in page_turner.scad) ----
+cap_shift   = 2.5;          // slide both caps this far toward the palm (USB end); 0 = caps at the far end
 lid_frame   = 1.0;          // lid material between a cap window and the lip
 cap_gap     = 3.0;          // lid bar between caps
 cap_recess  = 0.5;          // flat cap top sits this far below the lid surface
