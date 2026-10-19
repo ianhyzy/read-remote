@@ -1,0 +1,45 @@
+/*
+ * Read Remote: two direct-wired buttons on a Seeed XIAO nRF52840.
+ *   NEXT -> D0 and GND
+ *   PREV -> D1 and GND
+ * Internal pull-ups, active low. No matrix, no diodes.
+ */
+
+#include <dt-bindings/zmk/matrix_transform.h>
+#include <physical_layouts.dtsi>
+
+/ {
+    chosen {
+        zmk,physical-layout = &physical_layout0;
+    };
+
+    kscan0: kscan0 {
+        compatible = "zmk,kscan-gpio-direct";
+        wakeup-source;
+        input-gpios
+            = <&xiao_d 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>   /* NEXT */
+            , <&xiao_d 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;  /* PREV */
+    };
+
+    default_transform: keymap_transform0 {
+        compatible = "zmk,matrix-transform";
+        columns = <2>;
+        rows = <1>;
+        map = <RC(0,0) RC(0,1)>;
+    };
+
+    physical_layout0: physical_layout0 {
+        compatible = "zmk,physical-layout";
+        display-name = "Default";
+        transform = <&default_transform>;
+        kscan = <&kscan0>;
+        keys  /*                    w   h    x    y  rot  rx  ry */
+            = <&key_physical_attrs 100 100    0    0    0   0   0>   /* NEXT */
+            , <&key_physical_attrs 100 100    0  100    0   0   0>;  /* PREV */
+    };
+
+    soft_off_wakers {
+        compatible = "zmk,soft-off-wakeup-sources";
+        wakeup-sources = <&kscan0>;
+    };
+};

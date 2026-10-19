@@ -1,0 +1,31 @@
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+
+/*
+ * Key 0 = NEXT (big dished cap, far end, wired to D0)
+ * Key 1 = PREV (small domed cap, wired to D1)
+ *
+ * Page Down / Page Up: KOReader maps these to next/previous page (as do most
+ * reader apps). Remap in ZMK Studio or edit the bindings below.
+ */
+
+/ {
+    behaviors {
+        prev_off: prev_or_soft_off {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "hold-preferred";
+            tapping-term-ms = <5000>;   // tap = PREV, hold 5 s = power off
+            bindings = <&soft_off>, <&kp>;
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        default_layer {
+            display-name = "Read";
+            bindings = <&kp PG_DN   &prev_off 0 PG_UP>;
+        };
+    };
+};

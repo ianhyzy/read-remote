@@ -1,0 +1,2 @@
+config SHIELD_READ_REMOTE
+    def_bool $(shields_list_contains,read_remote)

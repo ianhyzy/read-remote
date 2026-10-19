@@ -1,0 +1,9 @@
+file_format: "1"
+id: read_remote
+name: Read Remote
+type: shield
+url: https://github.com/ianhyzy/read-remote
+requires: [seeed_xiao]
+features:
+  - keys
+  - studio

@@ -1,0 +1,10 @@
+# Firmware images built by GitHub Actions (see .github/workflows/build.yml).
+include:
+  - board: seeeduino_xiao_ble
+    shield: read_remote
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_ZMK_STUDIO=y
+    artifact-name: read_remote
+  - board: seeeduino_xiao_ble
+    shield: settings_reset
+    artifact-name: settings_reset

@@ -1,0 +1,6 @@
+if SHIELD_READ_REMOTE
+
+config ZMK_KEYBOARD_NAME
+    default "Read Remote"
+
+endif
