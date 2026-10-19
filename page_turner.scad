@@ -21,7 +21,7 @@ yp        = y_batt1 + 0.5 + po/2;                             // nearest switch 
 Ws        = (W - cap_gap)/2;  xs = (Ws + cap_gap)/2;          // side-by-side caps
 cap_h     = lid_t - cap_recess;
 z_shelf   = inner_h - flange_t - sw_h + preload;
-usb_w     = usb[0] + usb_slop;
+usb_zc    = z_pcb_top + usb[1]/2;                             // receptacle centre height
 
 // caps: [cx, cy, w, l, shape, style]; caps[0] = PREV, caps[1] = NEXT (single-cap variants: see below)
 caps =
@@ -80,6 +80,15 @@ module chamfered_block(s, c) {
 }
 snap_ys = [inner_l*0.25, inner_l*0.75];
 
+module usb_funnel() {   // overmold-sized opening with a 45deg lead-in; reaches past the lid lip
+  w = usb_plug[0]; h = usb_plug[1]; f = usb_flare;
+  hull() {
+    translate([-w/2 - f, -wall - 0.01, usb_zc - h/2 - f]) cube([w + 2*f, 0.01, h + f]);   // flare sides + bottom only (lid bridge above stays)
+    translate([-w/2, -wall + f, usb_zc - h/2]) cube([w, 0.01, h]);
+    translate([-w/2, lid_fit + lip_t + 0.3, usb_zc - h/2]) cube([w, 0.01, h]);
+  }
+}
+
 // ---------- base ----------
 module sw_pocket(x, y) difference() {
   translate([x - po/2, y - po/2, 0]) cube([po, po, z_shelf + pocket_wall_h]);
@@ -97,7 +106,7 @@ module base() {
   difference() {
     intersection() { outer3d(); translate([-50, -50, -floor_t - 1]) cube([100, 200, floor_t + inner_h + 1]); }
     linear_extrude(inner_h + 1) cavity2d();
-    translate([-usb_w/2, -wall - 1, z_pcb_top - 0.2]) cube([usb_w, wall + 2, 20]);     // USB-C notch
+    usb_funnel();
     for (s = [-1, 1], y = snap_ys)
       translate([s*inner_w/2 - (s > 0 ? 0 : snap_bump + 0.1), y - snap_len/2 - 0.3, inner_h - snap_z - 0.7])
         cube([snap_bump + 0.1, snap_len + 0.6, 1.4]);
@@ -129,7 +138,7 @@ module lid() {
     }
     for (c = caps) translate([c[0], c[1], inner_h - 1]) linear_extrude(lid_t + 2) cap2d(c, fit);
     translate([reset_pos[0], pcb_y0 + reset_pos[1], inner_h - 1]) cylinder(d = reset_hole_d, h = lid_t + 2);
-    translate([-usb_w/2 - 0.5, -1, inner_h - lip_h - 1]) cube([usb_w + 1, lip_t + lid_fit + 1.5, lip_h + 1]);
+    usb_funnel();
   }
 }
 

@@ -2,7 +2,7 @@
 
 3D-printable case for a two-button ZMK page-turner remote: Seeed XIAO nRF52840 + 402025 LiPo + two 6×6×5 silent tactile switches. Hand-wired, no PCB.
 
-Outer size with nominal parts: **25 × 64 × 14.5 mm**, pebble-shaped: both ends near-semicircular (r10), 2.5 mm rounded top edge, 3 mm rounded bottom edge. The PCB sits 3.3 mm back from the USB end wall so its corners clear the rounded cavity; the USB-C plug reaches it through the wall opening. The default layout is `kobo` (big dished NEXT at the rounded end, small domed PREV below it). Six other layouts are built in (`variant` in `page_turner.scad`); see [DESIGNS.md](DESIGNS.md). Four printed parts: `base`, `lid`, `plunger_next`, `plunger_prev`.
+Outer size with nominal parts: **25 × 64 × 14.5 mm**, pebble-shaped: both ends near-semicircular (r10), 2.5 mm rounded top edge, 3 mm rounded bottom edge. The PCB sits 3.3 mm back from the USB end wall so its corners clear the rounded cavity, so the USB opening is sized for the cable's overmold (12.5 × 7 mm, 45° lead-in) and spans the lid seam like a phone case; the plug body enters ~3.5 mm before the shell seats. The default layout is `kobo` (big dished NEXT at the rounded end, small domed PREV below it). Six other layouts are built in (`variant` in `page_turner.scad`); see [DESIGNS.md](DESIGNS.md). Four printed parts: `base`, `lid`, `plunger_next`, `plunger_prev`.
 
 ![layout](renders/layout.png) ![section](renders/section.png)
 
@@ -48,7 +48,7 @@ The PCB and battery corners sit just inside the rounded USB-end cavity; the mode
 | lid won't snap / too tight | `snap_bump` 0.4 → 0.3, or `lid_fit` 0.2 → 0.3 |
 | lid loose | `snap_bump` 0.4 → 0.5 |
 | switch loose in pocket | `pocket_fit` 0.15 → 0.1 |
-| USB plug doesn't fit | `usb_slop` 1.2 → 1.8 |
+| USB plug body doesn't fit | `usb_plug` [12.5, 7.0] → measure your cable's overmold and add 1 mm; `usb_flare` for the lead-in |
 
 ## Assembly
 1. Solder battery leads to the BAT+/BAT− pads on the XIAO's underside. Keep the joints low. Cover the pads with Kapton tape.

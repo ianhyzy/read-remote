@@ -15,3 +15,4 @@ png exploded exploded 60,0,30
 png section  section  0,0,0
 png caps     plunger_next 55,0,25
 png base_iso base     55,0,25
+png usb_end  assembly 70,0,350
