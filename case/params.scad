@@ -72,10 +72,11 @@ cov_margin  = 3.0;    // cover starts this far before the PREV cap
 cov_ramp    = 10.0;   // plate thins over this length to the open end, so it flows into the body
 cov_edge    = 0.8;    // plate thickness at the open end
 cov_skirt_taper = 9.0;   // skirt height feathers to zero over this length at the open end
+cov_notch   = 16.0;   // gap in the end skirt so the USB opening stays clear when the cover is parked at the palm end
 
-// ---- Magnets (optional, printed in place: pause at the roof layer, drop them in) ----
+// ---- Magnets (optional, in the cover plate, printed in place: pause at the roof layer, drop them in) ----
 magnet      = [6.0, 1.5];          // dia, thickness (0 dia = none). Two N52 6x1.5 discs, same pole up
-magnet_pos  = [[-4.5, 17.5], [4.5, 17.5]];   // X from centre, Y from PCB USB edge: under the PCB's antenna half, clear of pads
+magnet_x    = 5.0;                 // +/- X in the cover plate, just short of the rounded end
 magnet_fit  = 0.15;                // radial; pocket is magnet thickness + 0.2 tall
 
 // ---- Buttons (layout chosen by `variant` in page_turner.scad) ----

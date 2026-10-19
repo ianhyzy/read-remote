@@ -24,6 +24,7 @@ png coupon   coupon_base 55,0,25
 png cover_on  assembly_cover 55,0,25
 png cover_stored assembly_stored 55,0,25
 png cover_under assembly_stored 215,0,30
+png cover_usb  assembly_stored 70,0,350
 png cover    cover    55,0,25
 png cover_side assembly_stored 90,0,90
 png section_mag section_mag 0,0,0

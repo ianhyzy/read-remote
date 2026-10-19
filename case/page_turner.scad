@@ -101,8 +101,6 @@ module base() difference() {
           difference() { offset(0.5) cavity2d(); offset(-ledge_w) cavity2d(); }
           translate([-100, y_stop0 + stop_t - 0.01]) square([200, 200]);
         }
-        // magnet bosses under the PCB (pockets cut below)
-        if (magnet[0] > 0) for (mp = magnet_pos) translate([mp[0], pcb_setback + mp[1], -0.01]) cylinder(d = magnet[0] + 2*magnet_fit + 2, h = magnet[1] + 0.2 + 0.4 - 1.0 + 0.01);
         // PCB rails under the long edges, and full-height end stops (tray front also rests on these)
         for (s = [-1, 1]) {
           translate([s*(xiao[0]/2 - 0.4) - 0.6, 1.5, -0.01]) cube([1.2, y_pcb1 - 1.0, z_pcb + 0.01]);
@@ -112,13 +110,11 @@ module base() difference() {
     }
   }
   usb_funnel();
-  if (magnet[0] > 0) for (mp = magnet_pos)   // pocket floor 0.6 above the bed, roof 0.4 thick
-    translate([mp[0], pcb_setback + mp[1], -floor_t + 0.6]) cylinder(d = magnet[0] + 2*magnet_fit, h = magnet[1] + 0.2);
   for (s = [-1, 1], y = snap_ys)   // grooves for the lid's snap fingers
     translate([s*inner_w/2 - (s > 0 ? 0 : snap_bump + 0.1), y - snap_len/2 - 0.3, z_bump - 0.7]) cube([snap_bump + 0.1, snap_len + 0.6, 1.4]);
   if (lanyard_d > 0) translate([0, inner_l - ledge_w - 1, lanyard_z]) rotate([-90, 0, 0]) cylinder(d = lanyard_d, h = r_plan_far + 2);
-  for (z = [-floor_t + cov_groove_z - 0.5, inner_h - 1.0])   // cover grooves, bottom and top faces
-    translate([0, 0, z]) linear_extrude(1.0) cov_ring2d(0.5, -cov_rib - 0.05);
+  translate([0, 0, inner_h - 1.0]) linear_extrude(1.0) cov_ring2d(0.5, -cov_rib - 0.05);                     // top groove: button end
+  translate([0, inner_l, -floor_t + cov_groove_z - 0.5]) mirror([0, 1, 0]) linear_extrude(1.0) cov_ring2d(0.5, -cov_rib - 0.05);   // bottom groove: palm end
   translate([-pry_notch[0]/2, inner_l - 0.5, inner_h - pry_notch[1]]) cube([pry_notch[0], wall + 2, 5]);
 }
 
@@ -137,6 +133,10 @@ module cover() {   // z=0 outer face, inner face at z=cov_t, skirt up to cov_t+c
     translate([0, 0, cov_t + cov_skirt_h - 0.6]) linear_extrude(1) cov_ring2d(cov_fit + 0.6, cov_fit - 0.01);  // lead-in
     // ramp: outer face rises toward the open end so the plate thins from cov_t to cov_edge
     translate([0, cov_y0 + cov_ramp, 0]) rotate([-ramp_a, 0, 0]) translate([-100, -200, -50]) cube([200, 200, 50]);
+    // notch in the end skirt: clears the USB opening when parked at the palm end
+    translate([-cov_notch/2, inner_l + wall - r_plan_far, cov_t]) cube([cov_notch, 50, 20]);
+    // magnet pockets in the plate (0.6 skin on the outer face, roof toward the inside)
+    if (magnet[0] > 0) for (sx = [-1, 1]) translate([sx*magnet_x, inner_l + wall - r_plan_far - 1, 0.6]) cylinder(d = magnet[0] + 2*magnet_fit, h = magnet[1] + 0.2);
     // skirt ends feather to zero height over cov_skirt_taper
     translate([0, cov_y0 + cov_skirt_taper, cov_t + cov_skirt_h]) rotate([atan(cov_skirt_h / cov_skirt_taper), 0, 0]) translate([-100, -200, 0]) cube([200, 200, 50]);
   }
@@ -151,7 +151,7 @@ module cover() {   // z=0 outer face, inner face at z=cov_t, skirt up to cov_t+c
   }
 }
 module cover_on_top() translate([0, 0, inner_h + lid_t + cov_t]) mirror([0, 0, 1]) cover();
-module cover_stored() translate([0, 0, -floor_t - cov_t]) cover();
+module cover_stored() translate([0, inner_l, -floor_t - cov_t]) mirror([0, 1, 0]) cover();   // parked under the palm (USB) end
 
 // ---------- switch tray (drop-in; solder the switches on it before installing) ----------
 module tray_pocket(x, y) {
@@ -228,7 +228,7 @@ module hw() {
   color("Silver") translate([-usb[0]/2, pcb_setback - usb_overhang, z_pcb_top]) cube([usb[0], 7.3, usb[1]]);
   color("Gold") translate([reset_pos[0], pcb_setback + reset_pos[1], z_pcb_top]) cylinder(d = 2.5, h = 1.5);
   color("Red") translate([led_pos[0], pcb_setback + led_pos[1], z_pcb_top]) cylinder(d = 1.6, h = 0.6);
-  if (magnet[0] > 0) color("Silver") for (mp = magnet_pos) translate([mp[0], pcb_setback + mp[1], -floor_t + 0.7]) cylinder(d = magnet[0], h = magnet[1]);
+
   color("Tan") translate([-xiao[0]/2, y_pcb1 - 3, z_pcb_top]) cube([xiao[0], 3, 1]);
   color("SteelBlue") translate([-batt[0]/2, y_batt0 + batt_fit, 0]) cube([batt[0], batt[1], batt[2]]);
   for (s = sws) {
@@ -258,12 +258,11 @@ if (part == "plunger_next") plunger(next_cap);
 if (part == "plunger_prev") if (!is_undef(prev_cap)) plunger(prev_cap);
 if (part == "assembly") { color("Khaki") base(); color("Wheat") translate([0, 0, z_ledge]) tray(); color("LightSteelBlue", 0.7) lid(); color("Tomato") plungers(); hw(); }
 if (part == "exploded") { color("Khaki") base(); hw(); color("Wheat") translate([0, 0, z_ledge + 10]) tray(); translate([0, 0, 24]) color("LightSteelBlue") lid(); color("Tomato") plungers(36); }
-if (part == "section" || part == "section_mag") { x = part == "section" ? next_cap[0] : magnet_pos[1][0]; cut(x, "SlateGray") cover_stored(); cut(x, "Khaki") base(); cut(x, "Wheat") translate([0, 0, z_ledge]) tray(); cut(x, "LightSteelBlue") lid(); cut(x, "Tomato") plungers(); cut(x, "DimGray") hw(); }
+if (part == "section" || part == "section_mag") { x = part == "section" ? next_cap[0] : magnet_x; cut(x, "SlateGray") cover_stored(); cut(x, "Khaki") base(); cut(x, "Wheat") translate([0, 0, z_ledge]) tray(); cut(x, "LightSteelBlue") lid(); cut(x, "Tomato") plungers(); cut(x, "DimGray") hw(); }
 if (part == "layout") {
   color("Khaki") base(); hw(); color("Wheat", 0.6) translate([0, 0, z_ledge]) tray(); color("Tomato", 0.5) plungers();
   label("XIAO nRF52840", [0, pcb_setback + 9]); label("USB-C", [0, -4]);
   label("reset", [reset_pos[0], pcb_setback + reset_pos[1] + 2.5]); label("LED", [led_pos[0], pcb_setback + led_pos[1] - 2.5]);
-  if (magnet[0] > 0) label("magnets (below PCB)", [0, pcb_setback + magnet_pos[0][1] - 3.5]);
   label("antenna end / keepout", [0, y_pcb1 + 1.5]); label("battery under tray", [0, inner_l - 3]);
   if (len(caps) > 1) { label("PREV", caps[0]); label("NEXT", caps[1]); }
   else { label("NEXT (far end)", [0, caps[0][1] + 7]); label("PREV (near end)", [0, caps[0][1] - 7]); }
