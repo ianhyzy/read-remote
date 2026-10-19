@@ -58,7 +58,7 @@ The PCB and battery corners sit just inside the rounded USB-end cavity; the mode
 5. Set the XIAO on the side rails, component side up, USB-C facing the end opening. It is captured between the rounded cavity corners (front) and the chamfered end stops (back).
 6. Route switch wires along the side gaps beside the PCB and solder to the edge pads: NEXT switch → D0 and GND, PREV switch → D1 and GND (change in your ZMK keymap). Keep wires away from the antenna end (the tan strip in the layout render).
 7. Drop the caps into the lid windows from underneath (flange inside, cap out). NEXT is the far cap, PREV the one nearer the USB end (variant 6: PREV is the end button; drop its flange in before the switch).
-8. Press the lid on until the four side bumps snap in. To open, lift the lid edge at the USB opening with a fingernail. Thread a lanyard through the hole in the far end wall and knot it inside.
+8. Press the lid on until the four side bumps snap in. To open, work a fingernail under the lid edge along the sides near the USB end. Do not pry at the USB opening: the lid bridge above it is only ~1.4 mm thick. Thread a lanyard through the hole in the far end wall and knot it inside.
 
 Reset: poke a paperclip into the pinhole above the USB end. Double-press for the UF2 bootloader.
 
