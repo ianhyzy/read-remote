@@ -2,7 +2,7 @@
 // Stack (bottom up): floor | PCB on rails (USB end) ; battery on floor under a drop-in switch tray (button end) | caps | lid
 include <params.scad>
 
-part    = "assembly";   // base | lid | tray | plunger_next | plunger_prev | coupon_base | coupon_lid | coupon_tray | assembly | exploded | section | layout
+part    = "assembly";   // base | lid | tray | plunger_next | plunger_prev | cover | coupon_* | assembly | assembly_cover | assembly_stored | exploded | section | layout
 variant = "kobo";       // kobo | rocker | dishdome | bars | sidebyside | dot
 $fn = 48;
 
@@ -48,6 +48,7 @@ H_tot    = outer[2];
 corners  = [for (sx = [-1, 1]) [sx*(outer[0]/2 - r_plan_usb), -wall + r_plan_usb, r_plan_usb],
             for (sx = [-1, 1]) [sx*(outer[0]/2 - r_plan_far), inner_l + wall - r_plan_far, r_plan_far]];
 snap_ys  = [inner_l*0.25, inner_l*0.75];
+cov_y0   = yp - max(po/2, 5) - fit - cov_margin;   // cover starts here (relative to inner USB wall)
 z_bump   = inner_h - finger_h + 0.7;             // snap bump / groove centre
 
 // corner-fit checks: point (x,y) must lie inside a plan corner arc of radius r about (cx,cy)
@@ -115,9 +116,42 @@ module base() difference() {
     translate([mp[0], pcb_setback + mp[1], -floor_t + 0.6]) cylinder(d = magnet[0] + 2*magnet_fit, h = magnet[1] + 0.2);
   for (s = [-1, 1], y = snap_ys)   // grooves for the lid's snap fingers
     translate([s*inner_w/2 - (s > 0 ? 0 : snap_bump + 0.1), y - snap_len/2 - 0.3, z_bump - 0.7]) cube([snap_bump + 0.1, snap_len + 0.6, 1.4]);
-  if (lanyard_d > 0) translate([0, inner_l - ledge_w - 1, 2.5]) rotate([-90, 0, 0]) cylinder(d = lanyard_d, h = r_plan_far + 2);
+  if (lanyard_d > 0) translate([0, inner_l - ledge_w - 1, lanyard_z]) rotate([-90, 0, 0]) cylinder(d = lanyard_d, h = r_plan_far + 2);
+  for (z = [-floor_t + cov_groove_z - 0.5, inner_h - 1.0])   // cover grooves, bottom and top faces
+    translate([0, 0, z]) linear_extrude(1.0) cov_ring2d(0.5, -cov_rib - 0.05);
   translate([-pry_notch[0]/2, inner_l - 0.5, inner_h - pry_notch[1]]) cube([pry_notch[0], wall + 2, 5]);
 }
+
+// ---------- reversible cover ----------
+module cov_region2d(o) intersection() { offset(o) plan2d(); translate([-100, cov_y0 - 1]) square([200, 200]); }
+module cov_ring2d(o_out, o_in) difference() { cov_region2d(o_out); cov_region2d(o_in); }
+module cover() {   // z=0 outer face, inner face at z=cov_t, skirt up to cov_t+cov_skirt_h. Exported outer-face UP (see dispatch)
+  ramp_a = atan((cov_t - cov_edge) / cov_ramp);
+  difference() {
+    hull() {   // plate + skirt with a 1 mm 45deg edge on the outer face
+      linear_extrude(0.01) cov_region2d(cov_skirt_t + cov_fit - 1.0);
+      translate([0, 0, 1.0]) linear_extrude(cov_t + cov_skirt_h - 1.0) cov_region2d(cov_skirt_t + cov_fit);
+    }
+    translate([0, 0, cov_t]) linear_extrude(cov_skirt_h + 1) cov_region2d(cov_fit);          // the case
+    translate([-100, -100, -1]) cube([200, 100 + cov_y0, 20]);                                 // open end, straight cut
+    translate([0, 0, cov_t + cov_skirt_h - 0.6]) linear_extrude(1) cov_ring2d(cov_fit + 0.6, cov_fit - 0.01);  // lead-in
+    // ramp: outer face rises toward the open end so the plate thins from cov_t to cov_edge
+    translate([0, cov_y0 + cov_ramp, 0]) rotate([-ramp_a, 0, 0]) translate([-100, -200, -50]) cube([200, 200, 50]);
+    // skirt ends feather to zero height over cov_skirt_taper
+    translate([0, cov_y0 + cov_skirt_taper, cov_t + cov_skirt_h]) rotate([atan(cov_skirt_h / cov_skirt_taper), 0, 0]) translate([-100, -200, 0]) cube([200, 200, 50]);
+  }
+  zr = cov_t + cov_groove_z;   // rib: stepped so it enters from either direction; only where the skirt is full height
+  intersection() {
+    translate([-100, cov_y0 + cov_skirt_taper + 1, -1]) cube([200, 200, 20]);
+    union() {
+      translate([0, 0, zr - 0.2]) linear_extrude(0.4) cov_ring2d(cov_fit + 0.01, cov_fit - cov_rib);
+      translate([0, 0, zr - 0.5]) linear_extrude(0.3) cov_ring2d(cov_fit + 0.01, cov_fit - cov_rib/2);
+      translate([0, 0, zr + 0.2]) linear_extrude(0.3) cov_ring2d(cov_fit + 0.01, cov_fit - cov_rib/2);
+    }
+  }
+}
+module cover_on_top() translate([0, 0, inner_h + lid_t + cov_t]) mirror([0, 0, 1]) cover();
+module cover_stored() translate([0, 0, -floor_t - cov_t]) cover();
 
 // ---------- switch tray (drop-in; solder the switches on it before installing) ----------
 module tray_pocket(x, y) {
@@ -127,7 +161,10 @@ module tray_pocket(x, y) {
     translate([x + (sx > 0 ? d : -d - pocket_wall), y + (sy > 0 ? d - 1.2 : -d + 0.2), tray_t - 0.01]) cube([pocket_wall, 1.0, pocket_wall_h]);
 }
 module tray() {
-  linear_extrude(tray_t) intersection() { offset(-tray_fit) cavity2d(); translate([-100, y_t0]) square([200, 200]); }
+  difference() {
+    linear_extrude(tray_t) intersection() { offset(-tray_fit) cavity2d(); translate([-100, y_t0]) square([200, 200]); }
+    if (lanyard_d > 0) translate([-2, inner_l - 4, -1]) cube([4, 6, 5]);   // lanyard cord passes the tray edge here
+  }
   for (s = sws) tray_pocket(s[0], s[1]);
 }
 
@@ -211,6 +248,9 @@ module coupon(part_mod) intersection() { children(); translate([-100, y_cpn, -50
 if (part == "base") translate([0, 0, floor_t]) base();
 if (part == "lid") mirror([0, 0, 1]) translate([0, 0, -inner_h - lid_t]) lid();   // printed top-down
 if (part == "tray") tray();
+if (part == "cover") translate([0, 0, cov_t + cov_skirt_h]) mirror([0, 0, 1]) cover();   // printed outer face up, skirt on the bed
+if (part == "assembly_cover") { color("Khaki") base(); color("LightSteelBlue") lid(); color("Tomato") plungers(); color("SlateGray") cover_on_top(); }
+if (part == "assembly_stored") { color("Khaki") base(); color("LightSteelBlue") lid(); color("Tomato") plungers(); color("SlateGray") cover_stored(); }
 if (part == "coupon_base") translate([0, -y_cpn, floor_t]) coupon() base();
 if (part == "coupon_lid") mirror([0, 0, 1]) translate([0, -y_cpn, -inner_h - lid_t]) coupon() lid();
 if (part == "coupon_tray") translate([0, -y_cpn, 0]) coupon() tray();
@@ -218,7 +258,7 @@ if (part == "plunger_next") plunger(next_cap);
 if (part == "plunger_prev") if (!is_undef(prev_cap)) plunger(prev_cap);
 if (part == "assembly") { color("Khaki") base(); color("Wheat") translate([0, 0, z_ledge]) tray(); color("LightSteelBlue", 0.7) lid(); color("Tomato") plungers(); hw(); }
 if (part == "exploded") { color("Khaki") base(); hw(); color("Wheat") translate([0, 0, z_ledge + 10]) tray(); translate([0, 0, 24]) color("LightSteelBlue") lid(); color("Tomato") plungers(36); }
-if (part == "section" || part == "section_mag") { x = part == "section" ? next_cap[0] : magnet_pos[1][0]; cut(x, "Khaki") base(); cut(x, "Wheat") translate([0, 0, z_ledge]) tray(); cut(x, "LightSteelBlue") lid(); cut(x, "Tomato") plungers(); cut(x, "DimGray") hw(); }
+if (part == "section" || part == "section_mag") { x = part == "section" ? next_cap[0] : magnet_pos[1][0]; cut(x, "SlateGray") cover_stored(); cut(x, "Khaki") base(); cut(x, "Wheat") translate([0, 0, z_ledge]) tray(); cut(x, "LightSteelBlue") lid(); cut(x, "Tomato") plungers(); cut(x, "DimGray") hw(); }
 if (part == "layout") {
   color("Khaki") base(); hw(); color("Wheat", 0.6) translate([0, 0, z_ledge]) tray(); color("Tomato", 0.5) plungers();
   label("XIAO nRF52840", [0, pcb_setback + 9]); label("USB-C", [0, -4]);

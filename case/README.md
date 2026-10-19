@@ -6,7 +6,7 @@ Outer size with nominal parts: **26 × 64 × 17 mm**, pebble-shaped (r10 ends, 2
 
 ![layout](renders/kobo/layout.png) ![section](renders/kobo/section.png)
 
-## Printed parts (5, plus a 3-piece fit coupon)
+## Printed parts (6, plus a 3-piece fit coupon)
 | part | what | print orientation |
 |---|---|---|
 | `base` | shell with PCB rails, battery bay, tray ledge | as exported, open side up |
@@ -14,6 +14,7 @@ Outer size with nominal parts: **26 × 64 × 17 mm**, pebble-shaped (r10 ends, 2
 | `tray` | drop-in plate carrying both switches | as exported, pockets up |
 | `plunger_next` | big dished cap | as exported, cap up |
 | `plunger_prev` | small domed cap | as exported, cap up |
+| `cover` | reversible clip-on cover: over the buttons for travel, under the far end as a grip when not in use | as exported, outer face up (the inner face bridges between the skirt walls) |
 | `coupon_base/lid/tray` | the button end of the case only: both windows, both pockets, the rear snap fingers, tray ledge | same as the full parts |
 
 **Print the coupon first** with both caps and real switches. It tests `fit`, `snap_bump`, `pocket_fit`, `tray_fit` and the cap stack height in a fraction of the time of the full set.
@@ -42,6 +43,9 @@ Nominal values in `params.scad` are from datasheets. Caliper these and update:
 `sw_h` matters most: the switch has 0.25 mm of travel, so the cap stack is built to ±0.1 mm. `preload` defaults to -0.1 (caps float 0.1 mm at rest, a faint tick if shaken, never pre-actuated). Only go positive if the caps rattle, and never above +0.1.
 
 The model asserts that the PCB corners clear the rounded USB-end cavity and that the battery fits in its bay; if an assert fires it names the parameter to change.
+
+## Cover
+A U-shaped shell that clips over the button end from either face. A 0.3 mm rib inside its skirt snaps into a shallow groove 3.5 mm below the top face (travel: covers both buttons) or 3.5 mm above the bottom face (storage: adds 3 mm of grip under your fingers). The plate ramps from 3 mm to 0.8 mm and the skirt feathers out over the last 9 mm, so the open end flows into the body. Too tight or loose: `cov_fit`, `cov_rib`.
 
 ## Magnets (optional, printed in place)
 Two 6 × 1.5 mm N52 discs sit in closed pockets in the base floor under the PCB, so the remote sticks to a lamp base, bed frame, or a folio with a magnet. In Bambu Studio add **Pause at layer** at height 2.3 mm (the first roof layer: 0.6 mm skin + 1.7 mm pocket; with 0.1 mm layers that's layer 24). When it pauses, drop the magnets in with the **same pole up** on both, resume. The pockets are 0.2 mm taller than the magnet so the nozzle clears. Set `magnet = [0, 0]` to omit them. Positions are under the bare antenna half of the XIAO's underside; check your board's underside pads and move `magnet_pos` if a solder bump would land on a boss.
