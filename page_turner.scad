@@ -37,8 +37,7 @@ caps0 =
 tail      = fit + lid_frame + lip_t + lid_fit;                          // cap end to inner far wall
 inner_l_caps = max([for (c = caps0) c[1] + c[3]/2]) + tail;
 inner_l   = max(inner_l_caps, y_batt1 + r_plan_far - wall);             // battery must end before the far-end arc
-shift     = inner_l - inner_l_caps - cap_shift;                         // battery-driven slack, minus the user shift toward the palm
-assert(shift >= -0.01, "cap_shift too large: the PREV switch pocket would leave the tray");
+shift     = max(0, inner_l - inner_l_caps - cap_shift);                 // battery-driven slack minus the user shift, never past the tray front
 caps      = [for (c = caps0) [c[0], c[1] + shift, c[2], c[3], c[4], c[5], is_undef(c[6]) ? cap_r : c[6]]];
 yp        = yp0 + shift;
 sws       = variant == "rocker" ? [[0, yp], [0, yp + 18]] : [for (c = caps) [c[0], c[1]]];
