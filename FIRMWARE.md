@@ -10,7 +10,7 @@ ZMK config for the Seeed XIAO nRF52840 in the [case](../case/). Two direct-wired
 KOReader turns pages on Page Down / Page Up out of the box. Most other reader apps do too.
 
 ## Get the firmware
-GitHub Actions builds it on every push to `config/` or `build.yaml`. Open the latest run under **Actions**, download the `read_remote` artifact, unzip to get `read_remote-seeeduino_xiao_ble-zmk.uf2`.
+GitHub Actions builds it on every push to `config/` or `build.yaml`. Open the latest run under **Actions**, download the `firmware` artifact, unzip to get `read_remote.uf2` (and `settings_reset.uf2`).
 
 ## Flash
 1. Plug in USB-C. Double-press the reset button through the pinhole; a `XIAO-SENSE` drive appears.
