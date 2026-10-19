@@ -10,7 +10,7 @@ ZMK config for the Seeed XIAO nRF52840 in the [case](../case/). Two direct-wired
 KOReader turns pages on Page Down / Page Up out of the box. Most other reader apps do too.
 
 ## Get the firmware
-GitHub Actions builds it on every push to `firmware/`. Open the latest run under **Actions**, download the `read_remote` artifact, unzip to get `read_remote-seeeduino_xiao_ble-zmk.uf2`.
+GitHub Actions builds it on every push to `config/` or `build.yaml`. Open the latest run under **Actions**, download the `read_remote` artifact, unzip to get `read_remote-seeeduino_xiao_ble-zmk.uf2`.
 
 ## Flash
 1. Plug in USB-C. Double-press the reset button through the pinhole; a `XIAO-SENSE` drive appears.
@@ -34,4 +34,4 @@ On the e-reader, Bluetooth settings → pair **Read Remote**. ZMK keeps up to 5 
 - `build.yaml` — which images to build (`read_remote` + `settings_reset`).
 - `config/read_remote.keymap`, `config/read_remote.conf` — keymap and settings.
 - `config/boards/shields/read_remote/` — the shield: pins, physical layout, metadata.
-- `config/west.yml` — pulls ZMK `main`.
+- `config/west.yml` — pins ZMK v0.3 (on `main` the board id changes to `xiao_ble//zmk`).
