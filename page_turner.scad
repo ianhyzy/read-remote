@@ -11,7 +11,7 @@ inner_w   = max(batt[0] + 2*pocket_fit + 2*rail_w, xiao[0] + 2*side_gap) + v_ext
 z_pcb     = batt[2] + batt_gap;
 z_pcb_top = z_pcb + xiao[2];
 inner_h   = z_pcb_top + xiao_comp_h + top_gap;
-pcb_y0    = 0.3;
+pcb_y0    = pcb_setback;
 y_xiao1   = pcb_y0 + xiao[1];
 y_batt0   = lead_gap;
 y_batt1   = y_batt0 + batt[1] + 2*pocket_fit;
@@ -46,6 +46,10 @@ assert(z_shelf >= 0.5, "switch too tall for stack");
 assert(z_shelf + pocket_wall_h <= inner_h - flange_t - 0.5, "flange would hit pocket wall");
 assert(wall - (snap_bump + 0.1) >= 0.8, "snap groove leaves wall too thin");
 for (s = sws) assert(s[1] >= yp - 0.01, "switch pocket overlaps battery");
+ri = r_plan_usb - wall;   // cavity corner radius at the USB end
+function corner_ok(x, y) = y >= ri || sqrt(pow(x - (inner_w/2 - ri), 2) + pow(y - ri, 2)) <= ri;
+assert(corner_ok(xiao[0]/2 + pocket_fit, pcb_y0), "PCB corners hit the rounded cavity: raise pcb_setback or lower r_plan_usb");
+assert(corner_ok(batt[0]/2 + pocket_fit, y_batt0 + pocket_fit), "battery corners hit the rounded cavity: raise lead_gap or lower r_plan_usb");
 echo(variant=variant, outer=outer, inner=[inner_w, inner_l, inner_h], caps=caps, sws=sws);
 
 // ---------- helpers ----------
@@ -100,10 +104,13 @@ module base() {
     if (lanyard_d > 0) translate([end_btn ? 7 : 0, inner_l - 1, 4]) rotate([-90, 0, 0]) cylinder(d = lanyard_d, h = r_plan_far + 2);
     if (end_btn) translate([-(end_cap[0]/2 + fit), inner_l - 1, end_z - end_cap[1]/2 - fit]) cube([end_cap[0] + 2*fit, wall + 2, end_cap[1] + 2*fit]);
   }
-  for (s = [-1, 1]) {   // PCB rails + chamfered end stops
-    translate([s > 0 ? inner_w/2 - rail_w : -inner_w/2, 0, 0]) cube([rail_w, y_xiao1 + 1.2, z_pcb]);
-    translate([s > 0 ? xiao[0]/2 - 2 : -inner_w/2, y_xiao1 + pocket_fit, z_pcb])
-      chamfered_block([inner_w/2 - xiao[0]/2 + 2, 1.2, xiao[2] + 1.5], 1.0);
+  intersection() {   // PCB rails + chamfered end stops, clipped to the rounded cavity
+    linear_extrude(inner_h) cavity2d();
+    for (s = [-1, 1]) {
+      translate([s > 0 ? inner_w/2 - rail_w : -inner_w/2, 0, 0]) cube([rail_w, y_xiao1 + 1.2, z_pcb]);
+      translate([s > 0 ? xiao[0]/2 - 2 : -inner_w/2, y_xiao1 + pocket_fit, z_pcb])
+        chamfered_block([inner_w/2 - xiao[0]/2 + 2, 1.2, xiao[2] + 1.5], 1.0);
+    }
   }
   for (s = sws) sw_pocket(s[0], s[1]);
   if (end_btn) end_pocket();

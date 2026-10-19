@@ -2,7 +2,7 @@
 
 3D-printable case for a two-button ZMK page-turner remote: Seeed XIAO nRF52840 + 402025 LiPo + two 6×6×5 silent tactile switches. Hand-wired, no PCB.
 
-Outer size with nominal parts: **25 × 61 × 14.5 mm**, pebble-shaped: squarer at the USB end (r4.5), near-semicircular at the button end (r10), 2.5 mm rounded top edge, 3 mm rounded bottom edge. The default layout is `kobo` (big dished NEXT at the rounded end, small domed PREV below it). Six other layouts are built in (`variant` in `page_turner.scad`); see [DESIGNS.md](DESIGNS.md). Four printed parts: `base`, `lid`, `plunger_next`, `plunger_prev`.
+Outer size with nominal parts: **25 × 64 × 14.5 mm**, pebble-shaped: both ends near-semicircular (r10), 2.5 mm rounded top edge, 3 mm rounded bottom edge. The PCB sits 3.3 mm back from the USB end wall so its corners clear the rounded cavity; the USB-C plug reaches it through the wall opening. The default layout is `kobo` (big dished NEXT at the rounded end, small domed PREV below it). Six other layouts are built in (`variant` in `page_turner.scad`); see [DESIGNS.md](DESIGNS.md). Four printed parts: `base`, `lid`, `plunger_next`, `plunger_prev`.
 
 ![layout](renders/layout.png) ![section](renders/section.png)
 
@@ -23,7 +23,7 @@ Nominal values in `params.scad` are from datasheets. Caliper these and update:
 | `reset_pos` | reset button centre: X from PCB centreline, Y from the USB edge | 4.5, 2.5 |
 | `batt` | battery width × length × thickness, **including the PCM hump and tape** | 20 × 25 × 4.5 |
 
-The PCB corners sit in the USB-end cavity corners with ~0.2 mm to spare at `r_plan_usb` 4.5; if your XIAO measures wider than 17.8, drop `r_plan_usb` to 4.
+The PCB and battery corners sit just inside the rounded USB-end cavity; the model asserts this. If your XIAO or battery measures wider, raise `pcb_setback` / `lead_gap` or lower `r_plan_usb`.
 | `sw_h` | switch: floor to top of silicone dome, unpressed | 5.0 |
 | `sw_body` | switch body square | 6.0 |
 
@@ -55,7 +55,7 @@ The PCB corners sit in the USB-end cavity corners with ~0.2 mm to spare at `r_pl
 2. Solder one 28 AWG wire to each leg of both switches (2 wires per switch, ~35 mm). Bend the leads so they exit sideways through the pocket slots.
 3. Drop the switches into the two pockets, dome up, legs through the side slots. Add a dab of hot glue or CA on the pocket wall if they rattle.
 4. Lay the battery in the base, PCM/lead end toward the USB wall, in the 2 mm lead gap.
-5. Set the XIAO on the side rails, USB-C into the end notch, component side up. The chamfered end stops hold it from sliding back.
+5. Set the XIAO on the side rails, component side up, USB-C facing the end opening. It is captured between the rounded cavity corners (front) and the chamfered end stops (back).
 6. Route switch wires along the side gaps beside the PCB and solder to the edge pads: NEXT switch → D0 and GND, PREV switch → D1 and GND (change in your ZMK keymap). Keep wires away from the antenna end (the tan strip in the layout render).
 7. Drop the caps into the lid windows from underneath (flange inside, cap out). NEXT is the far cap, PREV the one nearer the USB end (variant 6: PREV is the end button; drop its flange in before the switch).
 8. Press the lid on until the four side bumps snap in. To open, lift the lid edge at the USB opening with a fingernail. Thread a lanyard through the hole in the far end wall and knot it inside.

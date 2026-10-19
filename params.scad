@@ -6,6 +6,7 @@ xiao        = [17.8, 21.0, 1.0];   // PCB width (X), length (Y, USB edge at y=0)
 xiao_comp_h = 3.3;                 // tallest top-side part (USB-C shell) above PCB top
 usb         = [9.0, 3.3];          // USB-C shell width, height (sits on PCB top)
 usb_overhang = 1.0;                // how far the shell nose sticks past the PCB edge (measure)
+pcb_setback = 3.3;                 // PCB USB edge to inner end wall (clears the r10 cavity corners; plug reaches through)
 usb_slop    = 1.2;                 // extra width/height on the USB notch for cable plugs
 reset_pos   = [4.5, 2.5];          // reset button: X from PCB centre, Y from USB edge (MEASURE)
 reset_hole_d = 1.6;                // pinhole diameter in lid
@@ -13,7 +14,7 @@ antenna_keepout = 3.0;             // empty zone past the PCB's far (antenna) ed
 
 // ---- Battery 402025 w/ PCM ----
 batt        = [20.0, 25.0, 4.5];   // width, length, thickness incl. PCM hump (MEASURE)
-lead_gap    = 2.0;                 // space at USB end of battery pocket for lead bend
+lead_gap    = 5.0;                 // battery start from the inner USB wall (lead bend room; also clears the r10 cavity corners)
 batt_gap    = 0.8;                 // kapton + solder bumps on the underside pads, between battery top and PCB
 
 // ---- 6x6x5 silent tactile switch, 2-pin SMD ----
@@ -33,7 +34,7 @@ preload     = 0.0;    // raise switch shelf to take up plunger slack (0.1 if cap
 wall        = 1.6;
 floor_t     = 1.6;
 lid_t       = 3.0;
-r_plan_usb  = 4.5;    // plan corner radius at the USB end (limited by the PCB corners)
+r_plan_usb  = 10.0;   // plan corner radius at the USB end (symmetric pebble; forces pcb_setback/lead_gap below)
 r_plan_far  = 10.0;   // plan corner radius at the button end (pebble end; <= outer width/2)
 r_top       = 2.5;    // lid top-edge fillet (<= lid_t)
 r_bot       = 3.0;    // base bottom-edge fillet; both get a 45deg blend at the bed so they print clean
