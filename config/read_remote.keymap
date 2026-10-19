@@ -8,8 +8,9 @@
  * Page Down / Page Up: KOReader maps these to next/previous page (as do most
  * reader apps). Remap in ZMK Studio or edit the bindings below.
  *
- * Hold PREV 5 s      = power off (any press wakes)
- * Hold NEXT+PREV 3 s = reboot into the UF2 bootloader for flashing
+ * Hold PREV 5 s        = power off (any press wakes)
+ * Hold NEXT+PREV 1-4 s = travel lock on/off (buttons ignored while locked)
+ * Hold NEXT+PREV 4 s+  = reboot into the UF2 bootloader for flashing
  */
 
 / {
@@ -21,12 +22,20 @@
             tapping-term-ms = <5000>;   // tap = PREV, hold 5 s = power off
             bindings = <&soft_off>, <&kp>;
         };
-        boot_ht: both_held_bootloader {
+        // Both buttons: tap = nothing, hold 1-4 s = travel lock on/off, hold 4 s+ = UF2 bootloader
+        lock_or_boot: lock_or_boot {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
             flavor = "hold-preferred";
-            tapping-term-ms = <3000>;   // both buttons held 3 s = UF2 bootloader (drag a .uf2 to flash)
-            bindings = <&bootloader>, <&none>;
+            tapping-term-ms = <3000>;
+            bindings = <&bootloader>, <&tog>;
+        };
+        both_ht: both_buttons {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "hold-preferred";
+            tapping-term-ms = <1000>;
+            bindings = <&lock_or_boot>, <&none>;
         };
     };
 
@@ -35,7 +44,7 @@
         combo_boot {
             timeout-ms = <80>;
             key-positions = <0 1>;
-            bindings = <&boot_ht 0 0>;
+            bindings = <&both_ht 1 0>;   // param 1 = the lock layer
         };
     };
 
@@ -45,6 +54,11 @@
         default_layer {
             display-name = "Read";
             bindings = <&kp PG_DN   &prev_off 0 PG_UP>;
+        };
+
+        lock_layer {   // travel lock: buttons do nothing; the both-buttons combo still works to unlock
+            display-name = "Locked";
+            bindings = <&none   &none>;
         };
     };
 };

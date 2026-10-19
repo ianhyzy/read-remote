@@ -69,7 +69,7 @@ magnet_fit  = 0.15;                // radial; pocket is magnet thickness + 0.2 t
 cap_shift   = 2.5;          // slide both caps this far toward the palm (USB end); 0 = caps at the far end
 lid_frame   = 1.0;          // lid material between a cap window and the lip
 cap_gap     = 3.0;          // lid bar between caps
-cap_recess  = 0.5;          // flat cap top sits this far below the lid surface
+cap_recess  = 1.0;          // flat cap top sits this far below the lid surface (PREV dome apex ends up 0.2 below it)
 cap_r       = 1.5;          // cap corner radius (default)
 next_r      = 5.5;          // kobo NEXT cap corner radius (a 16.6 mm rounded square)
 win_chamfer = 0.4;          // 45deg chamfer on the lid window top edges

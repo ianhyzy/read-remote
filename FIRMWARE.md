@@ -6,7 +6,7 @@ ZMK config for the Seeed XIAO nRF52840 in the [case](../case/). Two direct-wired
 |---|---|---|
 | NEXT (big dished cap) | D0 ↔ GND | Page Down |
 | PREV (small domed cap) | D1 ↔ GND | Page Up; **hold 5 s = power off** |
-| both together | | **hold 3 s = bootloader** (flash mode) |
+| both together | | **hold 1–4 s = travel lock on/off**; **hold 4 s+ = bootloader** |
 
 KOReader turns pages on Page Down / Page Up out of the box. Most other reader apps do too.
 
@@ -14,13 +14,18 @@ KOReader turns pages on Page Down / Page Up out of the box. Most other reader ap
 GitHub Actions builds it on every push to `config/` or `build.yaml`. Open the latest run under **Actions**, download the `firmware` artifact, unzip to get `read_remote.uf2` (and `settings_reset.uf2`).
 
 ## Flash
-1. Plug in USB-C. Hold **both buttons for 3 s**; a `XIAO-SENSE` drive appears. (Fallback, or on a blank board: double-press the reset button through the pinhole.)
+1. Plug in USB-C. Hold **both buttons for 4 s or more**; a `XIAO-SENSE` drive appears. (Fallback, or on a blank board: double-press the reset button through the pinhole.)
 2. Drag the `.uf2` onto it. The drive ejects itself and the remote reboots.
 
 Pairings misbehaving? Flash the `settings_reset` artifact the same way, then flash `read_remote` again. That wipes all bonds.
 
 ## Pair
 On the e-reader, Bluetooth settings → pair **Read Remote**. ZMK keeps up to 5 bonds; it reconnects to the last one.
+
+## Travel lock
+Hold both buttons for 1–4 s and release: the buttons are ignored until you do it again. Use it before the remote goes in a bag with the e-reader. The lock survives sleep and power off.
+
+Why it matters: when the remote is awake and paired, every press sends a key, and a Bluetooth key press will usually wake the e-reader's screen and turn a page. After 30 min idle it deep-sleeps; the first press only wakes it (that press is lost, reconnect takes about a second), and every press after that turns pages again. Power off behaves the same way: any press wakes it. So without the lock, a jostled bag turns pages.
 
 ## Power
 - Deep sleep after 30 min idle (`CONFIG_ZMK_IDLE_SLEEP_TIMEOUT`); any press wakes it, first press may be swallowed.
