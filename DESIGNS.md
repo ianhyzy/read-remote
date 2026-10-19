@@ -24,7 +24,7 @@ All share the same pebble base (XIAO + battery + wiring), the same 3 mm lid with
 
 | # | `variant` | NEXT | PREV | Tells them apart | Case L×W | Notes |
 |---|---|---|---|---|---|---|
-| 1 | `kobo` (default) | 16.6 × 17, follows the rounded end, **dished** | 10 mm **round dome** | size, shape, concave vs convex | 61 × 25 | Closest to the Kobo Remote. Strongest "which is which" cue. |
+| 1 | `kobo` (default) | 16.6 mm rounded square (r5.5), **dished** | 10 mm **round dome** | size, shape, concave vs convex | 61 × 25 | Closest to the Kobo Remote. Strongest "which is which" cue. |
 | 2 | `rocker` | far half of one 28 mm seesaw cap, dished | near end of same cap, raised dot | position + dot | 61 × 25 | One moving part, feels like a rocker. Small cross-talk risk: pressing one end loads the other dome ~10 %; test before committing. |
 | 3 | `dishdome` | 16.6 × 13 **dished** | 16.6 × 13 **domed** (peaks 0.3 mm above lid) | concave vs convex | 60 × 25 | Equal-size targets, no bar. Dome is findable under a blanket. |
 | 4 | `bars` | 16.6 × 19 flat | 16.6 × 9 flat | length | 64 × 25 | Oasis-style. Simplest to print. Weakest cue in the dark. |

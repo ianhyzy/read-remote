@@ -62,7 +62,8 @@ lanyard_d   = 2.2;    // hole through the far end wall, centred (0 = none)
 lid_frame   = 1.0;          // lid material between a cap window and the lip
 cap_gap     = 3.0;          // lid bar between caps
 cap_recess  = 0.5;          // flat cap top sits this far below the lid surface
-cap_r       = 1.5;          // cap corner radius
+cap_r       = 1.5;          // cap corner radius (default)
+next_r      = 5.5;          // kobo NEXT cap corner radius (a 16.6 mm rounded square)
 win_chamfer = 0.4;          // 45deg chamfer on the lid window top edges
 flange_lip  = 1.0;          // under-lid retaining flange, each side
 flange_t    = 1.0;

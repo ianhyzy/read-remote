@@ -26,9 +26,9 @@ yp0       = y_t0 + 1.0 + max(po/2, 5) + 1.0;    // first switch centre if the ca
 Ws        = (W - cap_gap)/2;  xs = (Ws + cap_gap)/2;
 cap_h     = lid_t - cap_recess;
 
-// caps: [cx, cy, w, l, shape, style]; caps[0] = PREV (near), caps[1] = NEXT (far)
+// caps: [cx, cy, w, l, shape, style, corner_r?]; caps[0] = PREV (near), caps[1] = NEXT (far)
 caps0 =
-  variant == "kobo"       ? [[0, yp0, 10, 10, "round", "dome"],      [0, yp0 + 15, W, 17, "rect", "dish"]] :
+  variant == "kobo"       ? [[0, yp0, 10, 10, "round", "dome"],      [0, yp0 + 15, W, W, "rect", "dish", next_r]] :
   variant == "rocker"     ? [[0, yp0 + 9, W, 28, "rect", "rocker"]] :
   variant == "dishdome"   ? [[0, yp0, W, 13, "rect", "dome"],        [0, yp0 + 16, W, 13, "rect", "dish"]] :
   variant == "bars"       ? [[0, yp0, W, 9, "rect", "flat"],         [0, yp0 + 17, W, 19, "rect", "flat"]] :
@@ -38,7 +38,7 @@ tail      = fit + lid_frame + lip_t + lid_fit;                          // cap e
 inner_l_caps = max([for (c = caps0) c[1] + c[3]/2]) + tail;
 inner_l   = max(inner_l_caps, y_batt1 + r_plan_far - wall);             // battery must end before the far-end arc
 shift     = inner_l - inner_l_caps;                                     // push the caps to the far end
-caps      = [for (c = caps0) [c[0], c[1] + shift, c[2], c[3], c[4], c[5]]];
+caps      = [for (c = caps0) [c[0], c[1] + shift, c[2], c[3], c[4], c[5], is_undef(c[6]) ? cap_r : c[6]]];
 yp        = yp0 + shift;
 sws       = variant == "rocker" ? [[0, yp], [0, yp + 18]] : [for (c = caps) [c[0], c[1]]];
 next_cap  = len(caps) > 1 ? caps[1] : caps[0];
@@ -73,8 +73,9 @@ module edge_profile(rp) intersection() { square([rp, H_tot]); hull() {
 module outer3d() hull() for (c = corners) translate([c[0], c[1], -floor_t]) rotate_extrude($fn = 96) edge_profile(c[2]);
 module allowed2d() offset(-(lid_fit + lip_t + lid_frame + fit)) cavity2d();
 module cap2d(c, grow = 0) intersection() {
+  r = is_undef(c[6]) ? cap_r : c[6];
   if (c[4] == "round") circle(d = c[2] + 2*grow);
-  else offset(cap_r + grow) square([c[2] - 2*cap_r, c[3] - 2*cap_r], center = true);
+  else offset(r + grow) square([c[2] - 2*r, c[3] - 2*r], center = true);
   translate([-c[0], -c[1]]) offset(grow) allowed2d();
 }
 module zslab(z0, z1) translate([-100, -100, z0]) cube([200, 300, z1 - z0]);
