@@ -1,0 +1,415 @@
+<title>Read Remote Build Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one bench-manual column; numbered steps, figures on a parts-tray surface, specs in mono. */
+:root {
+  --bg: #f6f4f0; --surface: #ebe7df; --ink: #23211e; --muted: #6b665e; --line: #d6d0c5;
+  --accent: #c9551f; --accent-soft: #f6e2d6; --warn: #9a2b1f; --warn-soft: #f7e1dc;
+  --w-next: #2f6fb0; --w-prev: #8a4fb8; --w-pos: #c8322f; --w-gnd: #23211e;
+  --pcb: #2f6b4f; --pad: #d4a93c; --pcb-ink: #f2efe7;
+  --f-display: "Barlow Semi Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1b1a18; --surface: #262421; --ink: #ece8e1; --muted: #a39d93; --line: #3a3732;
+  --accent: #ec7a43; --accent-soft: #3a2619; --warn: #f08a7a; --warn-soft: #3a1f1b;
+  --w-next: #6aa6e6; --w-prev: #b98ae6; --w-pos: #ef5d58; --w-gnd: #ece8e1;
+  --pcb: #2f6b4f; --pad: #d4a93c; --pcb-ink: #f2efe7; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #1b1a18; --surface: #262421; --ink: #ece8e1; --muted: #a39d93; --line: #3a3732;
+  --accent: #ec7a43; --accent-soft: #3a2619; --warn: #f08a7a; --warn-soft: #3a1f1b;
+  --w-next: #6aa6e6; --w-prev: #b98ae6; --w-pos: #ef5d58; --w-gnd: #ece8e1;
+  --pcb: #2f6b4f; --pad: #d4a93c; --pcb-ink: #f2efe7; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 64px }
+.wrap { max-width: 780px; margin: 0 auto }
+header { padding-block: 40px 24px; border-bottom: 1px solid var(--line) }
+.eyebrow { font: 500 12px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+h1 { font: 700 clamp(34px, 6vw, 48px)/1.05 var(--f-display); margin: 10px 0 12px; text-wrap: balance }
+h2 { font: 600 28px/1.15 var(--f-display); margin: 0; text-wrap: balance; display: flex; gap: 12px; align-items: baseline }
+h2 .n { font: 500 15px/1 var(--f-mono); color: var(--accent); min-width: 2ch }
+h3 { font: 600 19px/1.3 var(--f-display); margin: 22px 0 6px; letter-spacing: .01em }
+p { margin: 0 0 12px; max-width: 66ch }
+.lede { color: var(--muted); max-width: 60ch; margin: 0 }
+code, .mono { font-family: var(--f-mono); font-size: .9em }
+code { background: var(--surface); padding: 1px 5px; border-radius: 4px }
+a { color: var(--accent); text-underline-offset: 2px }
+a:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+
+nav.toc { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 18px; font: 500 14px/1.4 var(--f-body) }
+nav.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line) }
+nav.toc a:hover { border-color: var(--accent) }
+
+section { padding-block: 36px 8px; border-bottom: 1px solid var(--line); display: grid; gap: 4px }
+section:last-of-type { border-bottom: 0 }
+
+figure { margin: 16px 0; background: var(--surface); border-radius: 10px; padding: 16px; display: grid; gap: 10px; justify-items: center }
+figure img { display: block; width: auto; height: auto; max-width: 100%; max-height: 360px }
+figcaption { font-size: 14px; color: var(--muted); text-align: center; max-width: 60ch }
+.figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 16px 0 }
+.figs figure { margin: 0 }
+
+ol.steps, ul.checks { list-style: none; padding: 0; margin: 8px 0 12px; display: grid; gap: 8px }
+ol.steps { counter-reset: s }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start }
+ol.steps > li::before { content: counter(s); font: 500 13px/24px var(--f-mono); text-align: center; color: var(--accent); border: 1px solid var(--line); border-radius: 50%; width: 24px; height: 24px; margin-top: 1px }
+ol.steps > li > div { min-width: 0 }
+ul.checks li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start }
+ul.checks input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--accent) }
+ul.checks label { cursor: pointer }
+ul.checks input:checked + label { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line) }
+
+.note, .warn { border-radius: 8px; padding: 12px 14px; margin: 12px 0; font-size: 15px }
+.note { background: var(--accent-soft) }
+.warn { background: var(--warn-soft) }
+.warn strong { color: var(--warn) }
+.note p:last-child, .warn p:last-child { margin: 0 }
+
+.scroll { overflow-x: auto; margin: 12px 0 }
+table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top }
+th { font: 600 12px/1.3 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted) }
+td.mono { white-space: nowrap }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px 32px }
+.cols ul { margin: 6px 0 0; padding-left: 18px }
+.cols li { margin-bottom: 4px }
+
+.diagram { background: var(--surface); border-radius: 10px; padding: 12px; overflow-x: auto; margin: 16px 0 }
+.diagram svg { display: block; width: 100%; min-width: 600px; height: auto }
+svg text { font-family: var(--f-mono); font-size: 12px; fill: var(--ink) }
+svg .lbl { font-family: var(--f-display); font-size: 15px; font-weight: 600 }
+svg .sm { font-size: 11px; fill: var(--muted) }
+svg .on-pcb { fill: var(--pcb-ink) }
+svg .faint { fill: var(--pcb-ink); opacity: .45 }
+svg .wire { fill: none; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round }
+svg .w-next { stroke: var(--w-next) } svg .w-prev { stroke: var(--w-prev) }
+svg .w-pos { stroke: var(--w-pos) } svg .w-gnd { stroke: var(--w-gnd) }
+svg .pcb { fill: var(--pcb) } svg .pad { fill: var(--pad) }
+svg .under { fill: none; stroke: var(--pad); stroke-width: 2; stroke-dasharray: 3 2 }
+svg .body { fill: var(--ink) } svg .dome { fill: var(--muted) }
+svg .metal { fill: #b9bec4 } svg .batt { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5 }
+svg .outline { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--muted); margin-top: 8px }
+.legend span::before { content: ""; display: inline-block; width: 18px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; background: var(--c) }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">read-remote · XIAO nRF52840 · ZMK</div>
+  <h1>Read Remote Build Guide</h1>
+  <p class="lede">Print, flash, solder and close up the two-button Bluetooth page turner. All wiring is done on the bench and tested before anything goes into the case. Tick steps off as you go; the ticks stay in this browser.</p>
+  <nav class="toc" aria-label="Sections">
+    <a href="#parts">Parts</a><a href="#measure">Measure</a><a href="#print">Print</a><a href="#flash">Flash</a><a href="#wiring">Wiring</a><a href="#solder">Solder</a><a href="#test">Bench test</a><a href="#assemble">Assemble</a><a href="#use">Use</a><a href="#fix">Fixes</a>
+  </nav>
+</header>
+
+<section id="parts">
+  <h2><span class="n">01</span>Parts and tools</h2>
+  <div class="cols">
+    <div><h3>Parts</h3><ul>
+      <li>Seeed XIAO nRF52840</li>
+      <li>402025 LiPo, 150 mAh, with protection board</li>
+      <li>2 × 6×6×5 mm silent tact switch, silicone top</li>
+      <li>SS12D00G3 slide switch (3 mm handle)</li>
+      <li>28–30 AWG stranded wire, two or more colors</li>
+      <li>Kapton tape, solder</li>
+    </ul></div>
+    <div><h3>Tools</h3><ul>
+      <li>Fine-tip iron, flux</li>
+      <li>Flush cutters, tweezers, wire strippers</li>
+      <li>Multimeter with continuity beep</li>
+      <li>Calipers</li>
+      <li>Optional: a drop of CA glue for a loose knob</li>
+    </ul></div>
+  </div>
+  <div class="warn"><p><strong>LiPo safety.</strong> Never let the two battery leads touch. Cut and strip them one at a time and tape each end before touching the other. Keep the iron away from the pouch.</p></div>
+</section>
+
+<section id="measure">
+  <h2><span class="n">02</span>Measure before printing</h2>
+  <p>The model is built to nominal sizes. Caliper your parts and change <code>case/params.scad</code> where they differ, then run <code>./render.sh kobo</code> in <code>case/</code> to re-export the STLs.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Param</th><th>Measure</th><th>Nominal</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">sw_h</td><td>Tact switch, base to top of the silicone dome, unpressed. Get this to 0.05 mm: the switch only travels 0.25 mm.</td><td class="mono">5.0</td></tr>
+      <tr><td class="mono">batt</td><td>Battery width × length × thickness, including the protection-board bump and tape</td><td class="mono">20 × 25 × 4.5</td></tr>
+      <tr><td class="mono">psw</td><td>Slide switch body: length × depth (handle to pins) × height</td><td class="mono">8.6 × 3.6 × 3.5</td></tr>
+      <tr><td class="mono">psw_handle</td><td>Handle: along the slide × across × length past the body</td><td class="mono">2.0 × 1.5 × 3.0</td></tr>
+      <tr><td class="mono">usb_plug</td><td>Your bulkiest USB-C plug body, W × H, plus 1 mm</td><td class="mono">12.5 × 7.0</td></tr>
+      <tr><td class="mono">xiao</td><td>Board width × length × thickness</td><td class="mono">17.8 × 21 × 1.0</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="print">
+  <h2><span class="n">03</span>Print</h2>
+  <p>Bambu P1S, PLA, 0.4 mm nozzle. STLs are in <code>case/stl/kobo/</code>.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Layer height</td><td class="mono">0.10 mm</td></tr>
+      <tr><td>Walls</td><td class="mono">3</td></tr>
+      <tr><td>Supports</td><td>Off</td></tr>
+      <tr><td>Plate</td><td>Smooth or cool plate. The lid prints top-face down, so a textured plate would texture the top.</td></tr>
+      <tr><td>Caps</td><td>Ironing on, for a glossy top</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>First, the fit coupon</h3>
+  <p>Print <code>coupon_base</code>, <code>coupon_lid</code>, <code>coupon_tray</code>, both caps and one <code>knob</code>. It is the button end only and takes a fraction of the full print.</p>
+  <figure><img src="img/coupon.png" alt="Coupon parts: short base, short lid, tray, two caps" width="834" height="459"><figcaption>Fit coupon: button end of the base, lid and tray, plus both caps.</figcaption></figure>
+  <ul class="checks">
+    <li><input type="checkbox" id="c-cpn-sw"><label for="c-cpn-sw">Tact switches drop into the tray pockets without rocking.</label></li>
+    <li><input type="checkbox" id="c-cpn-snap"><label for="c-cpn-snap">Coupon lid snaps onto the coupon base and comes off with a fingernail in the notch.</label></li>
+    <li><input type="checkbox" id="c-cpn-caps"><label for="c-cpn-caps">With switches, tray and caps inside, each cap clicks once, returns, and does not rattle or stay pressed.</label></li>
+    <li><input type="checkbox" id="c-cpn-knob"><label for="c-cpn-knob">The knob pushes onto the slide switch handle firmly and does not wobble.</label></li>
+  </ul>
+  <p>If anything is off, see <a href="#fix">Fixes</a>, change the param, re-export, and reprint just that part.</p>
+
+  <h3>Then the full set</h3>
+  <figure><img src="img/plate.png" alt="All printed parts on the build plate in print orientation" width="860" height="462"><figcaption>One plate, as exported: base open side up, lid top face down, tray, both caps cap-up, three knobs flange down.</figcaption></figure>
+  <div class="scroll"><table>
+    <thead><tr><th>Part</th><th>Qty</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">base</td><td>1</td><td>Shell, PCB rails, battery bay, knob window</td></tr>
+      <tr><td class="mono">lid</td><td>1</td><td>Cap windows, pinholes, snap fingers, slide-switch cradle</td></tr>
+      <tr><td class="mono">tray</td><td>1</td><td>Carries the two tact switches</td></tr>
+      <tr><td class="mono">plunger_next</td><td>1</td><td>Big dished cap</td></tr>
+      <tr><td class="mono">plunger_prev</td><td>1</td><td>Small domed cap</td></tr>
+      <tr><td class="mono">knob</td><td>3</td><td>Tiny; spares cost nothing</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="flash">
+  <h2><span class="n">04</span>Flash and test the bare board</h2>
+  <p>Do this before soldering, so a bad board shows up before it is wired in.</p>
+  <ol class="steps">
+    <li><div>Download the latest <code>firmware</code> artifact from <a href="https://github.com/ianhyzy/read-remote/actions">the repo's Actions page</a> and unzip it. You need <code>read_remote.uf2</code>.</div></li>
+    <li><div>Plug the XIAO into your computer and double-press its reset button. A drive called <code>XIAO-SENSE</code> appears.</div></li>
+    <li><div>Drag <code>read_remote.uf2</code> onto the drive. It ejects itself and the board reboots.</div></li>
+    <li><div>On the e-reader, pair <strong>Read Remote</strong> in Bluetooth settings.</div></li>
+    <li><div>Touch tweezers across <span class="mono">D0</span> and <span class="mono">GND</span>: the page turns forward. <span class="mono">D1</span> to <span class="mono">GND</span> turns back.</div></li>
+  </ol>
+</section>
+
+<section id="wiring">
+  <h2><span class="n">05</span>Wiring</h2>
+  <p>Seven wires in total. Each tact switch connects one input pin to ground. The slide switch sits in the battery's positive lead, so off means fully disconnected.</p>
+  <div class="diagram" role="img" aria-label="Wiring diagram: NEXT switch between D0 and GND, PREV switch between D1 and GND, battery positive through the slide switch to BAT+, battery negative to BAT minus.">
+    <svg viewBox="0 0 720 420" xmlns="http://www.w3.org/2000/svg">
+      <!-- XIAO, component side up, USB at top -->
+      <rect class="outline" x="330" y="30" width="60" height="24" rx="3"/>
+      <text x="360" y="46" text-anchor="middle" class="sm">USB-C</text>
+      <rect class="pcb" x="280" y="50" width="160" height="222" rx="6"/>
+      <text x="360" y="150" text-anchor="middle" class="lbl on-pcb">XIAO</text>
+      <text x="360" y="168" text-anchor="middle" class="sm on-pcb" style="fill:var(--pcb-ink)">nRF52840 · top</text>
+      <g>
+        <rect class="pad" x="273" y="69" width="14" height="14"/><text x="294" y="80" class="on-pcb">D0</text>
+        <rect class="pad" x="273" y="97" width="14" height="14"/><text x="294" y="108" class="on-pcb">D1</text>
+        <rect class="pad" x="273" y="125" width="14" height="14" opacity=".45"/><text x="294" y="136" class="faint">D2</text>
+        <rect class="pad" x="273" y="153" width="14" height="14" opacity=".45"/><text x="294" y="164" class="faint">D3</text>
+        <rect class="pad" x="273" y="181" width="14" height="14" opacity=".45"/><text x="294" y="192" class="faint">D4</text>
+        <rect class="pad" x="273" y="209" width="14" height="14" opacity=".45"/><text x="294" y="220" class="faint">D5</text>
+        <rect class="pad" x="273" y="237" width="14" height="14" opacity=".45"/><text x="294" y="248" class="faint">D6</text>
+        <rect class="pad" x="433" y="69" width="14" height="14" opacity=".45"/><text x="426" y="80" text-anchor="end" class="faint">5V</text>
+        <rect class="pad" x="433" y="97" width="14" height="14"/><text x="426" y="108" text-anchor="end" class="on-pcb">GND</text>
+        <rect class="pad" x="433" y="125" width="14" height="14" opacity=".45"/><text x="426" y="136" text-anchor="end" class="faint">3V3</text>
+        <rect class="pad" x="433" y="153" width="14" height="14" opacity=".45"/><text x="426" y="164" text-anchor="end" class="faint">D10</text>
+        <rect class="pad" x="433" y="181" width="14" height="14" opacity=".45"/><text x="426" y="192" text-anchor="end" class="faint">D9</text>
+        <rect class="pad" x="433" y="209" width="14" height="14" opacity=".45"/><text x="426" y="220" text-anchor="end" class="faint">D8</text>
+        <rect class="pad" x="433" y="237" width="14" height="14" opacity=".45"/><text x="426" y="248" text-anchor="end" class="faint">D7</text>
+      </g>
+      <!-- underside battery pads -->
+      <text x="360" y="188" text-anchor="middle" class="sm on-pcb" style="fill:var(--pcb-ink)">underside</text>
+      <rect class="under" x="335" y="196" width="18" height="14"/><text x="330" y="207" text-anchor="end" class="on-pcb">BAT+</text>
+      <rect class="under" x="367" y="196" width="18" height="14"/><text x="390" y="207" class="on-pcb">BAT−</text>
+
+      <!-- tact switches -->
+      <g>
+        <rect class="body" x="86" y="52" width="48" height="48" rx="3"/><circle class="dome" cx="110" cy="76" r="11"/>
+        <rect class="metal" x="76" y="72" width="10" height="8"/><rect class="metal" x="134" y="72" width="10" height="8"/>
+        <text x="110" y="118" text-anchor="middle" class="lbl">NEXT</text>
+        <rect class="body" x="86" y="150" width="48" height="48" rx="3"/><circle class="dome" cx="110" cy="174" r="11"/>
+        <rect class="metal" x="76" y="170" width="10" height="8"/><rect class="metal" x="134" y="170" width="10" height="8"/>
+        <text x="110" y="216" text-anchor="middle" class="lbl">PREV</text>
+      </g>
+      <!-- slide switch (pins up, handle down) -->
+      <g>
+        <rect class="metal" x="310" y="330" width="100" height="30" rx="2"/>
+        <rect class="body" x="372" y="360" width="18" height="14"/>
+        <rect class="metal" x="327" y="318" width="6" height="12"/><rect class="metal" x="357" y="318" width="6" height="12"/><rect class="metal" x="387" y="318" width="6" height="12"/>
+        <text x="360" y="394" text-anchor="middle" class="lbl">SS12D00G3</text>
+        <text x="300" y="351" text-anchor="end" class="sm">ON pin</text>
+        <text x="360" y="351" text-anchor="middle" class="sm" style="fill:#2b2b2b">COM</text>
+        <text x="420" y="351" class="sm">unused</text>
+      </g>
+      <!-- battery -->
+      <g>
+        <rect class="batt" x="530" y="300" width="160" height="80" rx="6"/>
+        <text x="610" y="334" text-anchor="middle" class="lbl">LiPo 402025</text>
+        <text x="610" y="352" text-anchor="middle" class="sm">150 mAh · PCM</text>
+        <text x="566" y="294" class="sm">red</text>
+        <text x="656" y="294" class="sm">black</text>
+      </g>
+
+      <!-- wires -->
+      <path class="wire w-next" d="M273 76 H144"/>
+      <path class="wire w-prev" d="M273 104 H210 V174 H144"/>
+      <path class="wire w-gnd"  d="M76 76 H58 V174 H76 M58 76 V18 H500 V104 H447"/>
+      <path class="wire w-pos"  d="M560 300 V296 H360 V318"/>
+      <path class="wire w-pos"  d="M330 318 V288 H344 V210"/>
+      <path class="wire w-gnd"  d="M650 300 V282 H376 V210"/>
+    </svg>
+    <div class="legend">
+      <span style="--c:var(--w-next)">NEXT → D0</span>
+      <span style="--c:var(--w-prev)">PREV → D1</span>
+      <span style="--c:var(--w-gnd)">ground</span>
+      <span style="--c:var(--w-pos)">battery +</span>
+    </div>
+  </div>
+  <div class="scroll"><table>
+    <thead><tr><th>From</th><th>To</th><th>Length</th></tr></thead>
+    <tbody>
+      <tr><td>NEXT switch, leg A</td><td class="mono">D0</td><td class="mono">60 mm</td></tr>
+      <tr><td>PREV switch, leg A</td><td class="mono">D1</td><td class="mono">60 mm</td></tr>
+      <tr><td>NEXT leg B</td><td>PREV leg B</td><td class="mono">25 mm</td></tr>
+      <tr><td>PREV leg B</td><td><span class="mono">GND</span> (pin 2 on the 5V side)</td><td class="mono">70 mm</td></tr>
+      <tr><td>Battery red</td><td>Slide switch COM (middle pin)</td><td>battery lead</td></tr>
+      <tr><td>Slide switch ON pin</td><td><span class="mono">BAT+</span>, underside</td><td class="mono">50 mm</td></tr>
+      <tr><td>Battery black</td><td><span class="mono">BAT−</span>, underside</td><td>battery lead</td></tr>
+    </tbody>
+  </table></div>
+  <p>Cut long, trim at assembly. The <span class="mono">D0</span>/<span class="mono">D1</span> side of the board is the side the slide switch sits on in the case; <span class="mono">GND</span> is on the opposite side. The battery pads are labelled on the underside silkscreen; go by the labels, not by the diagram's positions.</p>
+</section>
+
+<section id="solder">
+  <h2><span class="n">06</span>Solder on the bench</h2>
+  <p>Build the whole harness outside the case. Nothing gets soldered inside the PLA.</p>
+
+  <h3>Tact switches on the tray</h3>
+  <figure><img src="img/tray_sw.png" alt="Tray with two tact switches in their pockets" width="747" height="580"><figcaption>Switches sit in the pockets with their legs toward the open sides. The tray holds them while you solder.</figcaption></figure>
+  <ul class="checks">
+    <li><input type="checkbox" id="c-tact-place"><label for="c-tact-place">Drop each switch into its pocket, legs toward the open sides. With four legs, use two diagonally opposite ones. A meter should beep across them only while pressed.</label></li>
+    <li><input type="checkbox" id="c-tact-sig"><label for="c-tact-sig">Solder a 60 mm signal wire to one leg of each switch. Mark which is NEXT (the far, big-cap position) and which is PREV.</label></li>
+    <li><input type="checkbox" id="c-tact-gnd"><label for="c-tact-gnd">Join the other legs with a short jumper, then add one 70 mm ground wire from PREV.</label></li>
+  </ul>
+
+  <h3>Slide switch</h3>
+  <ul class="checks">
+    <li><input type="checkbox" id="c-psw-meter"><label for="c-psw-meter">Push the handle to one end. With the meter, find which end pin beeps to the middle pin. Mark that end of the body: it is the ON pin when the handle is at that end. In the case, ON is the handle toward the buttons.</label></li>
+    <li><input type="checkbox" id="c-psw-trim"><label for="c-psw-trim">Trim the three pins to about 1.5 mm.</label></li>
+    <li><input type="checkbox" id="c-psw-wire"><label for="c-psw-wire">Solder a 50 mm wire to the ON pin. Lay it along the body face so it does not stick straight out: there is only 1 mm between the pins and the lid.</label></li>
+  </ul>
+
+  <h3>Battery</h3>
+  <ul class="checks">
+    <li><input type="checkbox" id="c-bat-red"><label for="c-bat-red">Cut the red lead behind the connector, strip 2 mm, solder it to the slide switch's middle pin. Kapton over the joint.</label></li>
+    <li><input type="checkbox" id="c-bat-blk"><label for="c-bat-blk">Only then cut the black lead and strip it. Tape the end until the next step.</label></li>
+  </ul>
+
+  <h3>XIAO</h3>
+  <ul class="checks">
+    <li><input type="checkbox" id="c-x-d0"><label for="c-x-d0">NEXT wire to <span class="mono">D0</span>, PREV wire to <span class="mono">D1</span>. Keep the <span class="mono">D1</span> joint low: the slide switch sits 2 mm above it.</label></li>
+    <li><input type="checkbox" id="c-x-gnd"><label for="c-x-gnd">Ground wire to <span class="mono">GND</span>, the second pad on the 5V side.</label></li>
+    <li><input type="checkbox" id="c-x-bat"><label for="c-x-bat">Slide switch ON wire to <span class="mono">BAT+</span> and battery black to <span class="mono">BAT−</span> on the underside. Run both wires out toward the end away from USB, flat against the board. Kapton over both joints.</label></li>
+  </ul>
+  <div class="note"><p>The board rests on 2 mm rails along its long edges, so the underside joints and Kapton must stay under 1.5 mm tall and between the rails.</p></div>
+</section>
+
+<section id="test">
+  <h2><span class="n">07</span>Bench test</h2>
+  <ul class="checks">
+    <li><input type="checkbox" id="c-t-on"><label for="c-t-on">Slide switch to ON. The remote reconnects to the e-reader within a few seconds.</label></li>
+    <li><input type="checkbox" id="c-t-btn"><label for="c-t-btn">NEXT turns forward, PREV turns back.</label></li>
+    <li><input type="checkbox" id="c-t-chg"><label for="c-t-chg">Plug in USB with the switch ON: the charge LED lights.</label></li>
+    <li><input type="checkbox" id="c-t-off"><label for="c-t-off">Switch to OFF: the e-reader shows it disconnected and the buttons do nothing.</label></li>
+  </ul>
+  <p>If OFF does not cut power, the ON wire is on the wrong end pin. Move it to the other end pin.</p>
+</section>
+
+<section id="assemble">
+  <h2><span class="n">08</span>Assemble</h2>
+  <ol class="steps">
+    <li><div>
+      <p><strong>Battery and board.</strong> Switch to OFF. Lay the battery flat in the bay at the far end, leads toward the board. Set the XIAO on its rails, components up, USB-C into the end opening. It is held by the end stops and the rounded corners.</p>
+      <figure><img src="img/base_pcb.png" alt="Base with battery in the far bay and the XIAO on its rails" width="590" height="618"><figcaption>Battery in the bay, XIAO on the rails, USB-C at the open end.</figcaption></figure>
+    </div></li>
+    <li><div>
+      <p><strong>Knob and slide switch.</strong> From inside, push the knob's tile out through the side window and slide it to the USB end of the window. Set the switch handle to OFF, then press the handle into the knob's pocket with the pins facing the board. The switch hangs on the knob until the lid goes on.</p>
+      <figure><img src="img/knob_in.png" alt="Cut-away from inside the base: knob flange behind the wall window, slide switch seated on it" width="748" height="494"><figcaption>Cut-away from inside: the knob's flange stays behind the wall, the switch body sits on the flange.</figcaption></figure>
+    </div></li>
+    <li><div>
+      <p><strong>Tray.</strong> Lower the tray onto the ledge around the battery. Its front edge rests on the board's end stops. Tuck the wires down along the sides, clear of the snap-finger slots in the walls.</p>
+      <figure><img src="img/tray_in.png" alt="Base with tray installed over the battery, switches on top" width="590" height="618"><figcaption>Tray on its ledge. Everything is below the lid's underside.</figcaption></figure>
+    </div></li>
+    <li><div>
+      <p><strong>Caps and lid.</strong> Put the lid face down on the bench and drop both caps into their windows, flange up. Turn the base over and lower it onto the lid. Check that the slide switch lines up between the two small walls on the lid, then press until all four fingers click.</p>
+      <figure><img src="img/lid_caps.png" alt="Lid face down with both caps sitting in their windows" width="632" height="560"><figcaption>Lid face down, caps in, flanges up.</figcaption></figure>
+    </div></li>
+  </ol>
+  <div class="figs">
+    <figure><img src="img/done.png" alt="Finished remote" width="585" height="633"><figcaption>Done.</figcaption></figure>
+    <figure><img src="img/side.png" alt="Side view with the power slider" width="834" height="320"><figcaption>Power slider on the side. The dot marks ON.</figcaption></figure>
+  </div>
+</section>
+
+<section id="use">
+  <h2><span class="n">09</span>Use</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Do</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Slider toward the buttons</td><td>On. Toward USB is off, with the battery fully disconnected.</td></tr>
+      <tr><td>Charge</td><td>Slider must be ON; it charges through the XIAO.</td></tr>
+      <tr><td>NEXT / PREV</td><td>Page Down / Page Up</td></tr>
+      <tr><td>Hold both, 1–4 s</td><td>Button lock on or off</td></tr>
+      <tr><td>Hold both, 4 s or more, on USB</td><td>Bootloader drive, for new firmware</td></tr>
+      <tr><td>Hold PREV 5 s</td><td>Soft power off; any press wakes it</td></tr>
+      <tr><td>Paperclip in the pinhole by USB, twice</td><td>Bootloader, if the buttons can't</td></tr>
+      <tr><td>Open the case</td><td>Fingernail in the notch at the far end</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="fix">
+  <h2><span class="n">10</span>Fixes</h2>
+  <p>Change the param in <code>case/params.scad</code>, run <code>./render.sh kobo</code>, reprint the one part.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Symptom</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td>Cap binds in its window</td><td class="mono">fit 0.25 → 0.35</td></tr>
+      <tr><td>Cap rattles or sits low</td><td class="mono">preload -0.1 → 0</td></tr>
+      <tr><td>Button stays pressed</td><td><span class="mono">preload -0.1 → -0.2</span>, and re-measure <span class="mono">sw_h</span></td></tr>
+      <tr><td>Lid too tight to snap</td><td><span class="mono">snap_bump 0.3 → 0.2</span></td></tr>
+      <tr><td>Lid loose</td><td class="mono">snap_bump 0.3 → 0.4</td></tr>
+      <tr><td>Tact switch loose in its pocket</td><td class="mono">pocket_fit 0.15 → 0.1</td></tr>
+      <tr><td>Knob stiff in the window</td><td class="mono">knob_fit 0.15 → 0.25</td></tr>
+      <tr><td>Knob loose on the handle</td><td><span class="mono">knob_pocket_fit 0.1 → 0.05</span>, or a drop of CA</td></tr>
+      <tr><td>USB plug won't seat</td><td class="mono">usb_plug, usb_flare</td></tr>
+      <tr><td>Pairing misbehaves</td><td>Flash <span class="mono">settings_reset.uf2</span>, then <span class="mono">read_remote.uf2</span>, then re-pair</td></tr>
+    </tbody>
+  </table></div>
+</section>
+</div>
+
+<script>
+(() => {
+  const KEY = "read-remote-guide-checks";
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { saved = {}; }
+  document.querySelectorAll('ul.checks input[type="checkbox"]').forEach(cb => {
+    if (saved[cb.id]) cb.checked = true;
+    cb.addEventListener("change", () => {
+      saved[cb.id] = cb.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+    });
+  });
+})();
+</script>

@@ -1,5 +1,7 @@
 # page-turner-case
 
+Step-by-step print, solder and assembly instructions with pictures: [build guide](../guide/index.html).
+
 3D-printable case for a two-button ZMK page-turner remote: Seeed XIAO nRF52840 + 402025 LiPo + two 6×6×5 silent tactile switches + an SS12D00G3 slide switch as a hard power cutoff for travel. Hand-wired, no PCB. Everything drops in from the top; no glue.
 
 Outer size with nominal parts: **26 × 64 × 17 mm**, pebble-shaped (r10 ends, rounded edges). The power slider is a flush 6 × 4 mm tile in the right side wall near the USB end. The default layout is `kobo` (big dished NEXT at the far end, small domed PREV below it). Five other layouts are built in (`variant` in `page_turner.scad`); see [DESIGNS.md](DESIGNS.md).
@@ -86,7 +88,7 @@ Wire: NEXT switch → **D0** and **GND**, PREV switch → **D1** and **GND**. Us
 2. **Slide switch.** Clip its three pins to ~2 mm and bend them flat against the body (away from the handle). Solder ~40 mm wires to the middle pin and one end pin.
 3. **Battery.** Solder BAT− to the XIAO's underside pad and the switch's end-pin wire to BAT+; the battery + lead goes to the switch's middle pin. Kapton over the joints. Lay the battery in the bay (the ring at the far end), lead end toward the PCB.
 4. **PCB.** Set the XIAO on the two rails, component side up, USB-C toward the end opening. It is captured in Y between the rounded cavity corners and the end stops; nothing else to do.
-5. **Knob and switch.** Push the knob through the wall window from inside, tile first, and slide it to the USB end of the window. Set the switch to the USB-end position, lower it into its pocket (handle toward the wall, pins toward the PCB) and push it outward until the handle seats in the knob. The lid's leg locks it there.
+5. **Knob and switch.** Push the knob through the wall window from inside, tile first, and slide it to the USB end of the window. Set the switch to the USB-end position, lower it into its pocket (handle toward the wall, pins toward the PCB) and push it outward until the handle seats in the knob. It hangs there until the lid's cradle closes around it.
 6. **Tray.** Lower the tray onto the ledge ring; its front edge rests on the PCB end stops. Solder the switch wires to D0 / D1 / GND. The gap above the PCB is 9 mm, so there is plenty of room.
 7. **Caps and lid.** Put the lid face-down on the bench, drop the caps into their windows (flange up). Turn the loaded base over onto it (the tray and switches have only a few tenths of play) and press until the four fingers click.
 8. **Open** with a fingernail in the notch at the far end. Thread a lanyard through the hole in the far wall and knot it inside.
@@ -98,5 +100,5 @@ Reset: paperclip into the pinhole above the USB end. Double-press for the UF2 bo
 - **Battery away from the antenna.** The pouch (foil) sits under the switch tray, 3 mm past the board end and 2 mm below the antenna plane, instead of directly under the chip antenna.
 - **PCB held three ways without glue.** Rails below; rounded cavity corners (front) and end stops (back) take plug insertion/removal loads; three lid pillars (two on bare PCB corners, one on the USB shell) stop it lifting.
 - **Snap fingers.** Four 1 mm × 5.5 mm fingers on the lid lip with relief slots, 0.3 mm bumps into wall grooves: ~1.5–2 % strain, inside PLA's elastic range. The continuous lip only locates.
-- **Power switch held four ways without glue.** Pocket end walls (Y), boss below and a lid block above (Z), the knob flange outside and a lid leg inside (X). The knob is trapped by its flange; the handle press fit only has to carry the slide.
+- **Power switch held by the lid, without glue.** A cradle on the lid (block on top, two end walls that take the slide load, a leg on the pin side) closes around the switch body; the knob flange sits between the body and the wall. The knob is trapped by its flange; the handle press fit only has to carry the slide.
 - **USB opening** is sized for the cable's plug body (the receptacle sits 3.3 mm behind the wall) with a 45° lead-in; it sits entirely in the base, below the lid seam.

@@ -114,12 +114,9 @@ module base() difference() {
         }
         // magnet bosses under the PCB (pockets cut below)
         if (magnet[0] > 0) for (mp = magnet_pos) translate([mp[0], pcb_setback + mp[1], -0.01]) cylinder(d = magnet[0] + 2*magnet_fit + 2, h = magnet[1] + 0.2 + 0.4 - 1.0 + 0.01);
-        // power-switch pocket: boss in the side gap, end walls, wall pad behind the flange
-        translate([0, 0, -0.01]) mirror([psw_side < 0 ? 1 : 0, 0, 0]) {
-          translate([xiao[0]/2 + pocket_fit, psw_y - psw[0]/2 - psw_fit - 1.0, 0]) cube([inner_w, psw[0] + 2*psw_fit + 2.0, psw_z0 + 0.01]);          // boss
-          for (e = [-1, 1]) translate([xiao[0]/2 + pocket_fit, psw_y + e*(psw[0]/2 + psw_fit + 0.5) - 0.5, 0]) cube([psw_xo - xiao[0]/2 - pocket_fit, 1.0, psw_z0 + psw[2] - 0.5]);   // end walls (stop at the body face; the flange lives beyond)
-          translate([inner_w/2 - psw_pad, psw_y - flange[0]/2 - 0.3, 0]) cube([psw_pad + 1, flange[0] + 0.6, psw_zc + flange[1]/2 + 0.3]);   // wall pad behind the flange
-        }
+        // power switch: wall pad behind the knob flange (the switch itself is held by the lid)
+        translate([0, 0, -0.01]) mirror([psw_side < 0 ? 1 : 0, 0, 0])
+          translate([inner_w/2 - psw_pad, psw_y - flange[0]/2 - psw_travel/2 - 0.3, 0]) cube([psw_pad + 1, flange[0] + psw_travel + 0.6, psw_zc + flange[1]/2 + 0.3]);
         // PCB rails under the long edges, and full-height end stops (tray front also rests on these)
         for (s = [-1, 1]) {
           translate([s*(xiao[0]/2 - 0.4) - 0.6, 1.5, -0.01]) cube([1.2, y_pcb1 - 1.0, z_pcb + 0.01]);
@@ -164,8 +161,15 @@ module lid() difference() {
         translate([s > 0 ? inner_w/2 - 3 : -inner_w/2, y + e*(finger_len/2 + relief_w/2) - relief_w/2, inner_h - lip_h - 1]) cube([3, relief_w, lip_h + 1]);
       mirror([psw_side < 0 ? 1 : 0, 0, 0]) translate([inner_w/2 - 3, psw_y - flange[0]/2 - 0.3, inner_h - lip_h - 1]) cube([3, flange[0] + 0.6, psw_zc + flange[1]/2 + 0.3 - (inner_h - lip_h - 1)]);   // lip relief over the knob flange
     }
-    // power-switch hold-down: block on the body top, leg down its inner (pin) face
+    // power-switch cradle: block on the body top, leg down its inner (pin) face, end walls (take the slide load)
     mirror([psw_side < 0 ? 1 : 0, 0, 0]) {
+      for (e = [-1, 1]) {
+        x0 = max(psw_xi - 1.0, usb[0]/2 + 0.3);  y0 = psw_y + e*(psw[0]/2 + psw_fit);  t = 1.2;
+        hull() {   // 0.6 mm lead-in at the tip so the lid finds the body
+          translate([x0, e > 0 ? y0 : y0 - t, psw_z0 + 1.0]) cube([psw_xo - x0, t, inner_h - psw_z0 - 1.0 + 0.01]);
+          translate([x0, e > 0 ? y0 + 0.6 : y0 - t, psw_z0 + 0.4]) cube([psw_xo - x0, t - 0.6, 0.01]);
+        }
+      }
       translate([psw_xi - 1.0 - 1.5, psw_y - psw[0]/2, psw_z0 + psw[2] + 0.15]) cube([psw_xo - 1.0 - (psw_xi - 2.5), psw[0], inner_h - psw_z0 - psw[2] - 0.15 + 0.01]);
       ly0 = max(psw_y - psw[0]/2, pcb_setback - usb_overhang + usb_len + 0.5);   // leg starts past the USB shell
       translate([psw_xi - 1.0 - 1.5, ly0, psw_z0 + 1.5]) cube([1.5, psw_y + psw[0]/2 - ly0, inner_h - psw_z0 - 1.5 + 0.01]);   // 1.0 of pin/solder room before the leg
