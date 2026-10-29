@@ -32,6 +32,9 @@ if (scene == "coupon") {
   color(C_tray) translate([64, -y_cpn, 0]) coupon() tray();
   color(C_cap) translate([92, 14, 0]) plunger(next_cap);
   color(C_cap) translate([92, -2, 0]) plunger(prev_cap);
+  color(C_case) translate([-2, -62, floor_t]) coupon_usb() base();
+  color(C_case) translate([30, -62, 0]) flip() coupon_usb() lid();
+  color(C_knob) translate([60, -50, 0]) knob();
 }
 if (scene == "tray_sw") { color(C_tray) translate([0, 0, z_ledge]) tray(); m_tact(); }
 if (scene == "base_pcb") { color(C_case) base(); m_pcb(); m_batt(); }

@@ -8,7 +8,7 @@ Outer size with nominal parts: **26 × 64 × 17 mm**, pebble-shaped (r10 ends, r
 
 ![layout](renders/kobo/layout.png) ![section](renders/kobo/section.png)
 
-## Printed parts (6, plus a 3-piece fit coupon)
+## Printed parts (6, plus a 5-piece fit coupon)
 | part | what | print orientation |
 |---|---|---|
 | `base` | shell with PCB rails, battery bay, tray ledge, power-switch pocket and window | as exported, open side up |
@@ -18,8 +18,9 @@ Outer size with nominal parts: **26 × 64 × 17 mm**, pebble-shaped (r10 ends, r
 | `plunger_next` | big dished cap | as exported, cap up |
 | `plunger_prev` | small domed cap | as exported, cap up |
 | `coupon_base/lid/tray` | the button end only, for fit testing | same as the full parts |
+| `coupon_usb_base/lid` | the USB end: power-switch window and cradle, USB funnel, near snap fingers | same as the full parts |
 
-**Print the coupon first** with both caps and real switches. It tests `fit`, `snap_bump`, `pocket_fit`, `tray_fit` and the cap stack height in a fraction of the time of the full set.
+**Print the coupons first** with both caps, a knob and the real switches. The button-end coupon tests `fit`, `snap_bump`, `pocket_fit`, `tray_fit` and the cap stack height; the USB-end coupon tests `knob_fit`, `knob_pocket_fit` and `psw_fit`. Together they take a fraction of the full set.
 
 ## Files
 - `params.scad` — every dimension and clearance. Edit this, not the model.

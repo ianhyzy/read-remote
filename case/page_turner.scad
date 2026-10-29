@@ -2,7 +2,7 @@
 // Stack (bottom up): floor | PCB on rails (USB end) ; battery on floor under a drop-in switch tray (button end) | caps | lid
 include <params.scad>
 
-part    = "assembly";   // base | lid | tray | knob | plunger_next | plunger_prev | coupon_base | coupon_lid | coupon_tray | assembly | exploded | section | section_psw | layout
+part    = "assembly";   // base | lid | tray | knob | plunger_next | plunger_prev | coupon_base | coupon_lid | coupon_tray | coupon_usb_base | coupon_usb_lid | assembly | exploded | section | section_psw | layout
 variant = "kobo";       // kobo | rocker | dishdome | bars | sidebyside | dot
 $fn = 48;
 
@@ -256,6 +256,9 @@ module cuty(y, c) color(c) projection(cut = true) rotate([-90, 0, 0]) translate(
 // ---------- fit coupon: the button end only (both caps, both pockets, the rear snap fingers, tray on its ledge) ----------
 y_cpn = yp - max(po/2, 5) - 2;
 module coupon(part_mod) intersection() { children(); translate([-100, y_cpn, -50]) cube([200, 200, 100]); }
+// USB-end coupon: USB funnel, PCB rails, power-switch window and lid cradle, the near snap fingers
+y_cpn_u = snap_ys[0] + finger_len/2 + relief_w + 1.0;
+module coupon_usb() intersection() { children(); translate([-100, -100, -50]) cube([200, 100 + y_cpn_u, 100]); }
 
 // ---------- dispatch ----------
 if (part == "base") translate([0, 0, floor_t]) base();
@@ -265,6 +268,8 @@ if (part == "knob") knob();
 if (part == "coupon_base") translate([0, -y_cpn, floor_t]) coupon() base();
 if (part == "coupon_lid") mirror([0, 0, 1]) translate([0, -y_cpn, -inner_h - lid_t]) coupon() lid();
 if (part == "coupon_tray") translate([0, -y_cpn, 0]) coupon() tray();
+if (part == "coupon_usb_base") translate([0, 0, floor_t]) coupon_usb() base();
+if (part == "coupon_usb_lid") mirror([0, 0, 1]) translate([0, 0, -inner_h - lid_t]) coupon_usb() lid();
 if (part == "plunger_next") plunger(next_cap);
 if (part == "plunger_prev") if (!is_undef(prev_cap)) plunger(prev_cap);
 if (part == "assembly") { color("Khaki") base(); color("Wheat") translate([0, 0, z_ledge]) tray(); color("LightSteelBlue", 0.7) lid(); color("Tomato") plungers(); color("DarkSlateGray") knob_placed(); hw(); }
