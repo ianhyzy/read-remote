@@ -39,5 +39,5 @@ Why it matters: when the remote is awake and paired, every press sends a key, an
 ## Files
 - `build.yaml` — which images to build (`read_remote` + `settings_reset`).
 - `config/read_remote.keymap`, `config/read_remote.conf` — keymap and settings.
-- `config/boards/shields/read_remote/` — the shield: pins, physical layout, metadata.
+- `boards/shields/read_remote/` — the shield: pins, physical layout, metadata. `zephyr/module.yml` makes the repo a Zephyr module so ZMK finds it.
 - `config/west.yml` — pins ZMK v0.3 (on `main` the board id changes to `xiao_ble//zmk`).
