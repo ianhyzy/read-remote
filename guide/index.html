@@ -90,6 +90,15 @@ svg .pcb { fill: var(--pcb) } svg .pad { fill: var(--pad) }
 svg .under { fill: none; stroke: var(--pad); stroke-width: 2; stroke-dasharray: 3 2 }
 svg .body { fill: var(--ink) } svg .dome { fill: var(--muted) }
 svg .metal { fill: #b9bec4 } svg .batt { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5 }
+svg .pin { fill: none; stroke: var(--muted); stroke-width: 3; stroke-linecap: square; stroke-linejoin: miter }
+svg .pin.thick { stroke-width: 5 }
+svg .shell { stroke: var(--ink); stroke-width: 1 }
+svg .cut { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 4 3 }
+svg .arrow, svg .dim { fill: none; stroke: var(--ink); stroke-width: 1.5 }
+svg .ah { fill: var(--ink) }
+svg .lidp { fill: var(--w-next); opacity: .35 }
+svg .basep { fill: var(--pad); opacity: .6 }
+svg .knob { fill: var(--muted) }
 svg .outline { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important } }
 </style>
@@ -146,11 +155,11 @@ svg .outline { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5 }
   <div class="scroll"><table>
     <thead><tr><th>Setting</th><th>Value</th></tr></thead>
     <tbody>
-      <tr><td>Layer height</td><td class="mono">0.10 mm</td></tr>
+      <tr><td>Layer height</td><td class="mono">0.12 mm</td></tr>
       <tr><td>Walls</td><td class="mono">3</td></tr>
       <tr><td>Supports</td><td>Off</td></tr>
-      <tr><td>Plate</td><td>Smooth or cool plate. The lid prints top-face down, so a textured plate would texture the top.</td></tr>
-      <tr><td>Caps</td><td>Ironing on, for a glossy top</td></tr>
+      <tr><td>Plate</td><td>Smooth PEI or cool plate. The lid prints top-face down, so a textured plate would texture the top.</td></tr>
+      <tr><td>Ironing</td><td>Off</td></tr>
     </tbody>
   </table></div>
 
@@ -287,10 +296,66 @@ svg .outline { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5 }
   </ul>
 
   <h3>Slide switch</h3>
+  <p>The switch lies on its side in the case, handle out through the wall. Its pins have only 1 mm of room before a wall on the lid, so they get clipped short and folded flat against the switch. Straight pins hit that wall and the switch won't sit flat.</p>
+  <div class="diagram" role="img" aria-label="Slide switch prep: 1, as bought with three long pins. 2, unused USB-end pin clipped flush, the other two clipped to 2 mm. 3, end view: each pin bent 90 degrees to lie flat against the bottom of the switch. 4, section of the case: switch on its side, handle in the knob, bent pins pointing down toward the board, 1 mm clear of the lid's cradle wall.">
+    <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="psw-ah" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" class="ah"/></marker></defs>
+      <!-- 1 as bought: front view, handle up -->
+      <rect class="metal" x="63" y="58" width="20" height="32" rx="1"/>
+      <rect class="metal shell" x="30" y="90" width="86" height="22"/><rect class="body" x="30" y="112" width="86" height="13"/>
+      <path class="pin" d="M53 125 V165 M73 125 V165 M93 125 V165"/>
+      <text x="73" y="212" text-anchor="middle" class="lbl">1 · As bought</text>
+      <text x="73" y="230" text-anchor="middle" class="sm">pins ~4 mm</text>
+      <!-- 2 clip -->
+      <rect class="metal" x="203" y="58" width="20" height="32" rx="1"/>
+      <rect class="metal shell" x="170" y="90" width="86" height="22"/><rect class="body" x="170" y="112" width="86" height="13"/>
+      <path class="pin" d="M193 125 V127 M213 125 V145 M233 125 V145"/>
+      <path class="cut" d="M184 145 H246"/>
+      <text x="186" y="160" text-anchor="middle" class="sm">flush</text>
+      <text x="252" y="149" class="sm">2 mm</text>
+      <text x="256" y="182" text-anchor="end" class="sm">ON end →</text>
+      <text x="213" y="212" text-anchor="middle" class="lbl">2 · Clip</text>
+      <text x="213" y="230" text-anchor="middle" class="sm">one flush, two 2 mm</text>
+      <!-- 3 bend: end view -->
+      <rect class="metal" x="360" y="24" width="30" height="46" rx="1"/>
+      <rect class="metal shell" x="340" y="70" width="70" height="48"/><rect class="body" x="340" y="118" width="70" height="24"/>
+      <path class="pin thick" d="M375 142 V151 H404"/>
+      <path class="arrow" d="M368 186 Q 402 186 410 162" marker-end="url(#psw-ah)"/>
+      <text x="418" y="190" class="sm">90°</text>
+      <text x="375" y="212" text-anchor="middle" class="lbl">3 · Bend flat</text>
+      <text x="375" y="230" text-anchor="middle" class="sm">end view</text>
+      <!-- 4 in the case: section -->
+      <rect class="lidp" x="470" y="20" width="242" height="20"/>
+      <rect class="lidp" x="548" y="40" width="30" height="125"/>
+      <rect class="lidp" x="578" y="40" width="92" height="82"/>
+      <rect class="basep" x="690" y="40" width="22" height="86"/><rect class="basep" x="690" y="194" width="22" height="66"/>
+      <rect class="pcb" x="470" y="235" width="170" height="20"/>
+      <rect class="metal shell" x="598" y="125" width="72" height="70"/>
+      <rect class="metal" x="670" y="145" width="42" height="30"/>
+      <path class="knob" d="M670 110 H690 V128 H712 V143 H690 V177 H712 V192 H690 V210 H670 V177 H690 V143 H670 Z"/>
+      <path class="pin thick" d="M598 160 H589 V190"/>
+      <path class="wire w-pos" d="M589 192 C589 215 566 214 560 234"/>
+      <path class="dim" d="M579 148 H597" marker-start="url(#psw-ah)" marker-end="url(#psw-ah)"/>
+      <text x="544" y="152" text-anchor="end" class="sm">1 mm</text>
+      <text x="544" y="62" text-anchor="end" class="sm">lid wall</text>
+      <text x="634" y="94" text-anchor="middle" class="sm">lid</text>
+      <text x="634" y="164" text-anchor="middle" class="sm" style="fill:#2b2b2b">switch</text>
+      <text x="718" y="100" class="sm">wall</text><text x="718" y="164" class="sm">knob</text>
+      <text x="480" y="249" class="sm on-pcb">XIAO</text>
+      <text x="476" y="196" class="sm">pins point</text><text x="476" y="210" class="sm">at the board</text>
+      <text x="591" y="283" text-anchor="middle" class="lbl">4 · In the case</text>
+    </svg>
+  </div>
+  <div class="figs">
+    <figure><img src="img/psw_prep.png" alt="Two slide switches seen from the pin side: left as bought with three long pins, right with one pin clipped flush and two folded flat" width="880" height="720"></figure>
+    <figure><img src="img/psw_lid.png" alt="Lid face down with the prepped slide switch sitting flat in its cradle between the two end walls" width="910" height="700"></figure>
+  </div>
   <ul class="checks">
-    <li><input type="checkbox" id="c-psw-meter"><label for="c-psw-meter">Push the handle to one end. With the meter, find which end pin beeps to the middle pin. Mark that end of the body: it is the ON pin when the handle is at that end. In the case, ON is the handle toward the buttons.</label></li>
-    <li><input type="checkbox" id="c-psw-trim"><label for="c-psw-trim">Trim the three pins to about 1.5 mm.</label></li>
-    <li><input type="checkbox" id="c-psw-wire"><label for="c-psw-wire">Solder a 50 mm wire to the ON pin. Lay it along the body face so it does not stick straight out: there is only 1 mm between the pins and the lid.</label></li>
+    <li><input type="checkbox" id="c-psw-meter"><label for="c-psw-meter">Push the handle to one end. With the meter, find which end pin beeps to the middle pin. Mark that end of the body: it is the ON end, and it faces the buttons in the case. The other end pin is unused.</label></li>
+    <li><input type="checkbox" id="c-psw-trim"><label for="c-psw-trim">Clip the unused pin flush with the body. Clip the middle pin and the ON pin to about 2 mm.</label></li>
+    <li><input type="checkbox" id="c-psw-bend"><label for="c-psw-bend">Bend each of those two pins 90° so it lies flat against the bottom of the switch. Grip the pin with flat pliers right where it leaves the body and push the tip over the jaw, so the pliers take the strain, not the plastic. Bend both toward the same long side.</label></li>
+    <li><input type="checkbox" id="c-psw-wire"><label for="c-psw-wire">Tin both pins. Solder a 50 mm wire to the ON pin, leaving from the pin tip, not sticking out sideways. The middle pin gets the battery red in the next step. Kapton over the joints.</label></li>
+    <li><input type="checkbox" id="c-psw-fit"><label for="c-psw-fit">Check: the switch sits flat in the lid's cradle between the two end walls, nothing touching the long wall on the pin side.</label></li>
   </ul>
 
   <h3>Battery</h3>
@@ -327,7 +392,7 @@ svg .outline { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5 }
       <figure><img src="img/base_pcb.png" alt="Base with battery in the far bay and the XIAO on its rails" width="590" height="618"></figure>
     </div></li>
     <li><div>
-      <p><strong>Knob and slide switch.</strong> From inside, push the knob's tile out through the side window and slide it to the USB end of the window. Set the switch handle to OFF, then press the handle into the knob's pocket with the pins facing the board. The switch hangs on the knob until the lid goes on.</p>
+      <p><strong>Knob and slide switch.</strong> From inside, push the knob's tile out through the side window and slide it to the USB end of the window. Set the switch handle to OFF, then press the handle into the knob's pocket with the ON end toward the buttons and the bent pins pointing down at the board. The switch hangs on the knob until the lid goes on.</p>
       <figure><img src="img/knob_in.png" alt="Cut-away from inside the base: knob flange behind the wall window, slide switch seated on it" width="748" height="494"></figure>
     </div></li>
     <li><div>

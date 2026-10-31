@@ -65,6 +65,7 @@ lanyard_z   = 2.5;    // above the inner floor (under the tray, in the empty end
 // ---- Power cutoff: SS12D00G3 slide switch in the battery + lead, side wall, USB half ----
 psw         = [8.6, 3.6, 3.5];     // body: length along the slide (Y), depth along the handle (X), height (Z)  (MEASURE)
 psw_handle  = [2.0, 1.5, 3.0];     // handle: along the slide, across, length past the body (G3 = 3.0)
+psw_pitch   = 2.0;                 // pin spacing (renders only)
 psw_travel  = 2.0;                 // slide throw (SS12D00: 2 +/- 0.3)
 psw_y       = 12.0;                // travel centre from the inner USB wall (stay in the USB half, away from the antenna)
 psw_side    = 1;                   // +1 right wall, -1 left wall (looking from the USB end, buttons up)
@@ -75,6 +76,7 @@ knob_flange = 1.0;                 // inner flange thickness (sits between the w
 knob_fit    = 0.15;                // tile vs window, per side
 knob_pocket_fit = 0.1;             // handle pocket, per side (press fit)
 knob_groove = [0.6, 0.3];          // fingernail groove across the tile: width, depth
+win_sag     = 0.2;                 // extra headroom above the knob window: its top edge is a bridge and PETG droops
 // ---- Magnets (optional, in the base floor under the PCB, printed in place: pause at the roof layer, drop them in) ----
 magnet      = [0, 0];               // dia, thickness (0 dia = none). Two N52 6x1.5 discs, same pole up
 magnet_pos  = [[-4.5, 17.5], [4.5, 17.5]];   // X from centre, Y from PCB USB edge: under the PCB's antenna half, clear of pads

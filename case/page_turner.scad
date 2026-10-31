@@ -2,7 +2,7 @@
 // Stack (bottom up): floor | PCB on rails (USB end) ; battery on floor under a drop-in switch tray (button end) | caps | lid
 include <params.scad>
 
-part    = "assembly";   // base | lid | tray | knob | plunger_next | plunger_prev | coupon_base | coupon_lid | coupon_tray | coupon_usb_base | coupon_usb_lid | assembly | exploded | section | section_psw | layout
+part    = "assembly";   // base | lid | tray | knob | plunger_next | plunger_prev | coupon_base | coupon_lid | coupon_tray | coupon_usb_base | coupon_usb_lid | assembly | exploded | section | section_psw | psw_prep | psw_lid | layout
 variant = "kobo";       // kobo | rocker | dishdome | bars | sidebyside | dot
 $fn = 48;
 
@@ -28,7 +28,7 @@ cap_h     = lid_t - cap_recess;
 
 // caps: [cx, cy, w, l, shape, style, corner_r?]; caps[0] = PREV (near), caps[1] = NEXT (far)
 caps0 =
-  variant == "kobo"       ? [[0, yp0, 10, 10, "round", "dome"],      [0, yp0 + 15, W, W, "rect", "dish", next_r]] :
+  variant == "kobo"       ? [[0, yp0, 10, 10, "round", "dome"],      [0, yp0 + 5 + W/2 + cap_gap, W, W, "rect", "dish", next_r]] :
   variant == "rocker"     ? [[0, yp0 + 9, W, 28, "rect", "rocker"]] :
   variant == "dishdome"   ? [[0, yp0, W, 13, "rect", "dome"],        [0, yp0 + 16, W, 13, "rect", "dish"]] :
   variant == "bars"       ? [[0, yp0, W, 9, "rect", "flat"],         [0, yp0 + 17, W, 19, "rect", "flat"]] :
@@ -132,7 +132,7 @@ module base() difference() {
     translate([s*inner_w/2 - (s > 0 ? 0 : snap_bump + 0.1), y - snap_len/2 - 0.3, z_bump - 0.7]) cube([snap_bump + 0.1, snap_len + 0.6, 1.4]);
   if (lanyard_d > 0) translate([0, inner_l - ledge_w - 1, lanyard_z]) rotate([-90, 0, 0]) cylinder(d = lanyard_d, h = r_plan_far + 2);
   mirror([psw_side < 0 ? 1 : 0, 0, 0]) {   // knob window through the wall, ON dot at the far end
-    translate([inner_w/2 - psw_pad - 1, psw_y, psw_zc]) rotate([90, 0, 90]) linear_extrude(psw_pad + wall + 2) offset(knob[2] + knob_fit) square([win[0] - 2*(knob[2] + knob_fit), win[1] - 2*(knob[2] + knob_fit)], center = true);
+    translate([inner_w/2 - psw_pad - 1, psw_y, psw_zc]) rotate([90, 0, 90]) linear_extrude(psw_pad + wall + 2) translate([0, win_sag/2]) offset(knob[2] + knob_fit) square([win[0] - 2*(knob[2] + knob_fit), win[1] + win_sag - 2*(knob[2] + knob_fit)], center = true);
     translate([inner_w/2 + wall - 0.3, psw_y + win[0]/2 + 1.2, psw_zc]) rotate([0, 90, 0]) cylinder(d = 1.0, h = 1);
   }
   translate([-pry_notch[0]/2, inner_l - 0.5, inner_h - pry_notch[1]]) cube([pry_notch[0], wall + 2, 5]);
@@ -231,6 +231,15 @@ module knob() difference() {
 module knob_placed(on = true) mirror([psw_side < 0 ? 1 : 0, 0, 0]) translate([inner_w/2 - psw_pad - knob_flange, psw_y + (on ? 1 : -1)*psw_travel/2, psw_zc]) rotate([0, 90, 0]) rotate([0, 0, 90]) knob();
 
 // ---------- hardware mockups ----------
+// slide switch, local: pin face at x = 0, handle +X, ON end +Y. prep: unused (-Y) pin clipped flush, the other two clipped and bent flat along the pin face, toward the PCB
+module psw_hw(prep = true) {
+  color("DimGray") { translate([0, -psw[0]/2, 0]) cube([psw[1], psw[0], psw[2]]);
+    translate([psw[1] - 0.01, psw_travel/2 - psw_handle[0]/2, psw[2]/2 - psw_handle[1]/2]) cube([psw_handle[2] + 0.01, psw_handle[0], psw_handle[1]]); }
+  color("Silver") for (i = [-1:1]) translate([0, i*psw_pitch - 0.4, psw[2]/2 - 0.15])
+    if (!prep) translate([-4, 0, 0]) cube([4.01, 0.8, 0.3]);
+    else if (i < 0) translate([-0.2, 0, 0]) cube([0.21, 0.8, 0.3]);
+    else { translate([-0.5, 0, 0]) cube([0.51, 0.8, 0.3]); translate([-0.5, 0, -1.5]) cube([0.3, 0.8, 1.8]); }
+}
 module hw() {
   color("DarkSeaGreen") translate([-xiao[0]/2, pcb_setback, z_pcb]) cube([xiao[0], xiao[1], xiao[2]]);
   color("Silver") translate([-usb[0]/2, pcb_setback - usb_overhang, z_pcb_top]) cube([usb[0], usb_len, usb[1]]);
@@ -238,10 +247,7 @@ module hw() {
   color("Red") translate([led_pos[0], pcb_setback + led_pos[1], z_pcb_top]) cylinder(d = 1.6, h = 0.6);
   if (magnet[0] > 0) color("Silver") for (mp = magnet_pos) translate([mp[0], pcb_setback + mp[1], -floor_t + 0.7]) cylinder(d = magnet[0], h = magnet[1]);
   color("Tan") translate([-xiao[0]/2, y_pcb1 - 3, z_pcb_top]) cube([xiao[0], 3, 1]);
-  color("DimGray") mirror([psw_side < 0 ? 1 : 0, 0, 0]) {   // power switch body + handle (ON = far end)
-    translate([psw_xi, psw_y - psw[0]/2, psw_z0]) cube([psw[1], psw[0], psw[2]]);
-    translate([psw_xo - 0.01, psw_y + psw_travel/2 - psw_handle[0]/2, psw_zc - psw_handle[1]/2]) cube([psw_handle[2] + 0.01, psw_handle[0], psw_handle[1]]);
-  }
+  mirror([psw_side < 0 ? 1 : 0, 0, 0]) translate([psw_xi, psw_y, psw_z0]) psw_hw();   // power switch, ON = far end
   color("SteelBlue") translate([-batt[0]/2, y_batt0 + batt_fit, 0]) cube([batt[0], batt[1], batt[2]]);
   for (s = sws) {
     color("DimGray") translate([s[0] - sw_body/2, s[1] - sw_body/2, z_shelf]) cube([sw_body, sw_body, sw_h - 1]);
@@ -273,7 +279,10 @@ if (part == "coupon_usb_lid") mirror([0, 0, 1]) translate([0, 0, -inner_h - lid_
 if (part == "plunger_next") plunger(next_cap);
 if (part == "plunger_prev") if (!is_undef(prev_cap)) plunger(prev_cap);
 if (part == "assembly") { color("Khaki") base(); color("Wheat") translate([0, 0, z_ledge]) tray(); color("LightSteelBlue", 0.7) lid(); color("Tomato") plungers(); color("DarkSlateGray") knob_placed(); hw(); }
-if (part == "section_psw") { y = psw_y + psw_travel/2; cuty(y, "Khaki") base(); cuty(y, "LightSteelBlue") lid(); cuty(y, "DarkSlateGray") knob_placed(); cuty(y, "DimGray") hw(); }
+if (part == "section_psw") { y = psw_y + 0.3;   // through the handle and the middle pin
+  cuty(y, "Khaki") base(); cuty(y, "LightSteelBlue") lid(); cuty(y, "DarkSlateGray") knob_placed(); cuty(y, "DimGray") hw(); }
+if (part == "psw_prep") for (b = [0, 1]) translate([b*9, 0, 0]) rotate([0, -90, 0]) psw_hw(b == 1);   // bench view: as bought, then prepped; handle up
+if (part == "psw_lid") mirror([0, 0, 1]) translate([0, 0, -inner_h - lid_t]) { color("LightSteelBlue") coupon_usb() lid(); mirror([psw_side < 0 ? 1 : 0, 0, 0]) translate([psw_xi, psw_y, psw_z0]) psw_hw(); }   // lid as on the bench, switch in its cradle
 if (part == "exploded") { color("Khaki") base(); hw(); color("Wheat") translate([0, 0, z_ledge + 10]) tray(); translate([0, 0, 24]) color("LightSteelBlue") lid(); color("Tomato") plungers(36); color("DarkSlateGray") translate([psw_side*12, 0, 0]) knob_placed(); }
 if (part == "section" || part == "section_mag") { x = part == "section" ? next_cap[0] : magnet_pos[1][0]; cut(x, "Khaki") base(); cut(x, "Wheat") translate([0, 0, z_ledge]) tray(); cut(x, "LightSteelBlue") lid(); cut(x, "Tomato") plungers(); cut(x, "DimGray") hw(); }
 if (part == "layout") {

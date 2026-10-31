@@ -23,6 +23,8 @@ png base_top base     0,0,0
 png coupon   coupon_base 55,0,25
 png coupon_usb coupon_usb_base 55,0,25
 png section_psw section_psw 0,0,0
+png psw_prep psw_prep 120,0,25
+png psw_lid  psw_lid  45,0,300
 png knob knob 55,0,25
 png side assembly 90,0,90
 png side_iso assembly 60,0,60
